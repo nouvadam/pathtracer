@@ -11,7 +11,7 @@ example:
 To use this path tracer in your project, paste this to `Cargo.toml`:
 ```toml
 [dependencies]
-pathtracer = { git = "https://github.com/nouvadam/pathtracer/" }
+pathtracer = { git = "https://github.com/nouvadam/pathtracer/", branch = "main"}
 ```
 To check out the documentation, first generate one by:
 `cargo doc`
