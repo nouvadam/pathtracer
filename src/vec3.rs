@@ -102,7 +102,6 @@ impl<T> V3<T> {
     }
 }
 
-
 /*impl<T: Add> Add for V3<T> {
     type Output = Self;
 
@@ -252,7 +251,6 @@ impl<
 }
 
 impl V3<f32> {
-
     /// Returns vector with components floored to the whole.
     pub fn floor(self) -> V3<f32> {
         V3::new(self.x.floor(), self.y.floor(), self.z.floor())

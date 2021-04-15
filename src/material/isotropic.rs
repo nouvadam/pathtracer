@@ -1,8 +1,8 @@
 use crate::hit::Hit;
 use crate::material::*;
-use crate::V3;
 use crate::ray::Ray;
 use crate::texture::Texture;
+use crate::V3;
 
 /// "Isotropic materials have identical material properties in all directions at every given point."
 

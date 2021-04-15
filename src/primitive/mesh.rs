@@ -1,9 +1,9 @@
 use crate::hit::*;
 use crate::hitables::{BvhNode, HitableList, AABB};
 use crate::material::Material;
-use crate::V3;
 use crate::primitive::triangle::*;
 use crate::ray::*;
+use crate::V3;
 /// Mesh of triangles, or polygon model
 #[derive(Clone)]
 pub struct Mesh {
@@ -25,7 +25,7 @@ impl Hitable for Mesh {
 impl Mesh {
     /// Returns new polygon model, if it could be made.
     ///
-    /// `file_path` - Path to the .obj file. 
+    /// `file_path` - Path to the .obj file.
     ///
     /// `material` - Material of the model.
     pub fn new(

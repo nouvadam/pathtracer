@@ -1,6 +1,6 @@
-use crate::{Ray, V3, Hit, Hitable};
 use crate::hitables::AABB;
 use crate::material::Material;
+use crate::{Hit, Hitable, Ray, V3};
 
 use rand::Rng;
 /// Struct representing some primitive like Sphere that was changed into some sort of smoke/fog/mist.

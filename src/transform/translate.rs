@@ -1,5 +1,5 @@
 use crate::hitables::AABB;
-use crate::{Ray, V3, Hit, Hitable};
+use crate::{Hit, Hitable, Ray, V3};
 /// Represents translated object.
 #[derive(Clone)]
 pub struct Translated {

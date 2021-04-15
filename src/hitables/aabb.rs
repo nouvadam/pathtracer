@@ -1,5 +1,5 @@
-use crate::V3;
 use crate::ray::Ray;
+use crate::V3;
 use itertools::*;
 
 /// Bounding box, to use with Octtree

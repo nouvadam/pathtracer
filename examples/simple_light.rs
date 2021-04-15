@@ -1,9 +1,9 @@
-use raytracer::*;
-use raytracer::misc::*;
-use raytracer::material::*;
-use raytracer::primitive::*;
-use raytracer::texture::*;
-use raytracer::hitables::*;
+use pathtracer::hitables::*;
+use pathtracer::material::*;
+use pathtracer::misc::*;
+use pathtracer::primitive::*;
+use pathtracer::texture::*;
+use pathtracer::*;
 fn main() {
     let mut hitable = HitableList::new();
 
@@ -54,11 +54,10 @@ fn main() {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 4,
         },
-        name: "simple_light"
+        name: "simple_light",
     };
 
     Scene {
-        
         camera: Camera::new(
             V3::new(26.0, 3.0, 6.0), //lookfrom
             V3::new(0.0, 2.0, 0.0),  //lookat
@@ -70,7 +69,7 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable)
+        world: Box::new(hitable),
     }
     .loop_render(image_config, 12);
 }

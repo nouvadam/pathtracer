@@ -1,13 +1,13 @@
 use itertools::*;
 use rand::Rng;
 
-use raytracer::*;
-use raytracer::material::*;
-use raytracer::primitive::*;
-use raytracer::texture::*;
-use raytracer::misc::*;
-use raytracer::transform::*;
-use raytracer::hitables::*;
+use pathtracer::hitables::*;
+use pathtracer::material::*;
+use pathtracer::misc::*;
+use pathtracer::primitive::*;
+use pathtracer::texture::*;
+use pathtracer::transform::*;
+use pathtracer::*;
 
 fn main() {
     let mut boxes = HitableList::new();
@@ -184,7 +184,7 @@ fn main() {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 32,
         },
-        name: "final_scene"
+        name: "final_scene",
     };
 
     let scene = Scene {
@@ -199,7 +199,7 @@ fn main() {
             0.0,                           //time0
             1.0,                           //time1
         ),
-        world: Box::new(objects)
+        world: Box::new(objects),
     };
 
     scene.loop_render(image_config, 12);

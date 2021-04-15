@@ -1,8 +1,8 @@
 use crate::hit::*;
 use crate::hitables::AABB;
 use crate::material::Material;
-use crate::V3;
 use crate::ray::*;
+use crate::V3;
 
 const EPSILON: f32 = 0.001;
 /// Rectangle aligned to XY axis.

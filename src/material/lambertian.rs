@@ -1,8 +1,8 @@
 use crate::hit::Hit;
 use crate::material::Material;
-use crate::V3;
 use crate::ray::Ray;
 use crate::texture::Texture;
+use crate::V3;
 /// Diffusely reflecting surface.
 #[derive(Clone)]
 pub struct Lambertian {

@@ -1,10 +1,10 @@
-use raytracer::*;
-use raytracer::material::*;
-use raytracer::primitive::*;
-use raytracer::texture::*;
-use raytracer::transform::*;
-use raytracer::hitables::*;
-//use raytracer::misc::*;
+use pathtracer::hitables::*;
+use pathtracer::material::*;
+use pathtracer::primitive::*;
+use pathtracer::texture::*;
+use pathtracer::transform::*;
+use pathtracer::*;
+//use pathtracer::misc::*;
 
 // Stanford dragon
 
@@ -32,7 +32,7 @@ fn main() {
         Box::new(Mesh::new("assets/dragon.obj", gold_metal).unwrap())
             //.rotate(V3::new(0.0, 1.0, 0.0), 0.8)
             .rotate(V3::new(0.0, 1.0, 0.0), 3.1415)
-            .translate(V3::new(0.0, 0.0, 1.0))
+            .translate(V3::new(0.0, 0.0, 1.0)),
     );
 
     let image_config = ImageConfig {
@@ -43,22 +43,22 @@ fn main() {
             background_color: V3::new(0.5, 0.7, 1.0),
             depth: 16,
         },
-        name: r#"dragon"#
+        name: r#"dragon"#,
     };
 
     Scene {
         camera: Camera::new(
-            V3::new(0.0, 1.0, -2.0),   //lookfrom
-            V3::new(0.0, 0.4, 0.0), //lookat
-            V3::new(0.0, 1.0, 0.0),   //vup
-            45.0,                     //vertical_fov
-            1.0,                      //aspect
-            0.0,                      //aperture
-            5.0,                      //focus_dist
-            0.0,                      //time0
-            1.0,                      //time1
+            V3::new(0.0, 1.0, -2.0), //lookfrom
+            V3::new(0.0, 0.4, 0.0),  //lookat
+            V3::new(0.0, 1.0, 0.0),  //vup
+            45.0,                    //vertical_fov
+            1.0,                     //aspect
+            0.0,                     //aperture
+            5.0,                     //focus_dist
+            0.0,                     //time0
+            1.0,                     //time1
         ),
-        world: Box::new(BvhNode::new(hitable))
+        world: Box::new(BvhNode::new(hitable)),
     }
     .loop_render(image_config, 12);
 }

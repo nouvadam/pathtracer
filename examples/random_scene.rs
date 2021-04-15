@@ -1,10 +1,10 @@
+use pathtracer::hitables::*;
+use pathtracer::material::*;
+use pathtracer::misc::*;
+use pathtracer::primitive::*;
+use pathtracer::texture::*;
+use pathtracer::*;
 use rand::Rng;
-use raytracer::*;
-use raytracer::material::*;
-use raytracer::primitive::*;
-use raytracer::texture::*;
-use raytracer::misc::*;
-use raytracer::hitables::*;
 
 fn main() {
     let mut hitable = HitableList::new();
@@ -114,7 +114,7 @@ fn main() {
             background_color: V3::new(0.5, 0.7, 1.0),
             depth: 32,
         },
-        name: "random_scene"
+        name: "random_scene",
     };
 
     Scene {
@@ -129,7 +129,7 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable)
+        world: Box::new(hitable),
     }
     .loop_render(image_config, 12);
 }

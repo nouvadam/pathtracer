@@ -13,8 +13,8 @@ pub use light_source::LightSource;
 pub use metalic::Metalic;
 
 use crate::hit::Hit;
-use crate::V3;
 use crate::ray::Ray;
+use crate::V3;
 
 use objekt_clonable::*; //allows to clone refs to trait objects
 /// Each object that implements Material trait should be able to scatter incoming ray.
@@ -73,7 +73,7 @@ pub fn refract(uv: V3<f32>, n: V3<f32>, etai_over_etat: f32) -> V3<f32> {
 /// Schlick's approximation for reflectance
 ///
 /// `cosine` - Cosine of the angle of incoming Ray.
-/// 
+///
 /// `refractive_index` - Refractive index.
 pub fn schlick(cosine: f32, refractive_index: f32) -> f32 {
     let r0 = ((1.0 - refractive_index) / (1.0 + refractive_index)).powi(2);

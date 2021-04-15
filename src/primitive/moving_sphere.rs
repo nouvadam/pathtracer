@@ -1,8 +1,8 @@
 use crate::hit::*;
 use crate::hitables::AABB;
 use crate::material::Material;
-use crate::V3;
 use crate::ray::*;
+use crate::V3;
 /// Primitive representing sphere that moves during some time interval.
 #[derive(Clone)]
 pub struct MovingSphere {

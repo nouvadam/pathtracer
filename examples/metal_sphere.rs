@@ -1,8 +1,8 @@
-use raytracer::*;
-use raytracer::material::*;
-use raytracer::primitive::*;
-use raytracer::texture::*;
-use raytracer::hitables::*;
+use pathtracer::hitables::*;
+use pathtracer::material::*;
+use pathtracer::primitive::*;
+use pathtracer::texture::*;
+use pathtracer::*;
 
 fn main() {
     let mut hitable = HitableList::new();
@@ -57,11 +57,10 @@ fn main() {
             background_color: V3::new(0.5, 0.7, 1.0),
             depth: 32,
         },
-        name: r#"metal_sphere"#
+        name: r#"metal_sphere"#,
     };
 
     Scene {
-        
         camera: Camera::new(
             V3::new(0.0, 0.0, 1.0),  //lookfrom
             V3::new(0.0, 0.0, -1.0), //lookat
@@ -73,7 +72,7 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable)
+        world: Box::new(hitable),
     }
     .loop_render(image_config, 12);
 }

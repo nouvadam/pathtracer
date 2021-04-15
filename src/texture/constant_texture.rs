@@ -1,5 +1,5 @@
-use crate::V3;
 use crate::texture::Texture;
+use crate::V3;
 /// Texture with constant color.
 #[derive(Clone)]
 pub struct ConstantTexture {

@@ -1,9 +1,9 @@
-use raytracer::*;
-use raytracer::material::*;
-use raytracer::primitive::*;
-use raytracer::texture::*;
-use raytracer::transform::*;
-use raytracer::hitables::*;
+use pathtracer::hitables::*;
+use pathtracer::material::*;
+use pathtracer::primitive::*;
+use pathtracer::texture::*;
+use pathtracer::transform::*;
+use pathtracer::*;
 
 // https://www.cgtrader.com/free-3d-print-models/art/sculptures/pegasus-statue-sculpture-statuette-figurine-horse
 
@@ -99,7 +99,7 @@ fn main() {
         Box::new(Mesh::new("assets/pegasus.obj", _glass_material).unwrap())
             //.rotate(V3::new(0.0, 1.0, 0.0), 0.8)
             .rotate(V3::new(0.0, 1.0, 0.0), 3.1415)
-            .translate(V3::new(0.85, 0.0, 0.85))
+            .translate(V3::new(0.85, 0.0, 0.85)),
     );
 
     let image_config = ImageConfig {
@@ -110,22 +110,22 @@ fn main() {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 16,
         },
-        name: r#"pegasus"#
+        name: r#"pegasus"#,
     };
 
     Scene {
         camera: Camera::new(
-            V3::new(0.85, 0.85, -1.7),   //lookfrom
-            V3::new(0.85, 0.85, 0.0), //lookat
-            V3::new(0.0, 1.0, 0.0),   //vup
-            45.0,                     //vertical_fov
-            1.0,                      //aspect
-            0.0,                      //aperture
-            5.0,                      //focus_dist
-            0.0,                      //time0
-            1.0,                      //time1
+            V3::new(0.85, 0.85, -1.7), //lookfrom
+            V3::new(0.85, 0.85, 0.0),  //lookat
+            V3::new(0.0, 1.0, 0.0),    //vup
+            45.0,                      //vertical_fov
+            1.0,                       //aspect
+            0.0,                       //aperture
+            5.0,                       //focus_dist
+            0.0,                       //time0
+            1.0,                       //time1
         ),
-        world: Box::new(BvhNode::new(hitable))
+        world: Box::new(BvhNode::new(hitable)),
     }
     .loop_render(image_config, 12);
 }

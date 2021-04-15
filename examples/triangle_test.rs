@@ -8,15 +8,15 @@ use raytracer::material::lambertian::Lambertian;
 use raytracer::primitive::sphere::Sphere;
 use raytracer::primitive::triangle::Triangle;
 use raytracer::texture::constant_texture::ConstantTexture;
-use raytracer::transform::translate::*;*/
+use pathtracer::transform::translate::*;*/
 
-//use raytracer::Camera;
-use raytracer::*;
-use raytracer::material::*;
-use raytracer::primitive::*;
-use raytracer::texture::*;
-use raytracer::transform::*;
-use raytracer::hitables::*;
+//use pathtracer::Camera;
+use pathtracer::hitables::*;
+use pathtracer::material::*;
+use pathtracer::primitive::*;
+use pathtracer::texture::*;
+use pathtracer::transform::*;
+use pathtracer::*;
 
 fn main() {
     let mut hitable = HitableList::new();
@@ -64,7 +64,7 @@ fn main() {
             background_color: V3::new(0.5, 0.7, 1.0),
             depth: 32,
         },
-        name: r#"triangle_test"#
+        name: r#"triangle_test"#,
     };
 
     Scene {
@@ -79,7 +79,7 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable)
+        world: Box::new(hitable),
     }
-    .loop_render(image_config,12);
+    .loop_render(image_config, 12);
 }

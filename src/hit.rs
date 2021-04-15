@@ -23,7 +23,6 @@ pub struct Hit<'a> {
     pub front_face: bool,
 }
 
-
 impl<'a> Hit<'a> {
     /// Method to create new hit struct, it imposes correct normal vector
     ///

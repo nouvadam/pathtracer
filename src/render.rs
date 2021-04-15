@@ -1,5 +1,5 @@
 use crate::misc::PPM;
-use crate::{V3, Hitable, Camera, RaySetting};
+use crate::{Camera, Hitable, RaySetting, V3};
 
 use itertools::*;
 use rand::Rng;
@@ -111,15 +111,30 @@ impl Render for Scene {
             let now = Instant::now();
 
             let image = self.render(image_config);
-
+			
+			image
+                .write_file(&format!(
+                    "{}_{}.ppm",
+                    image_config.name, image_config.samples_per_pixel
+                ))
+                .expect("YOU FAILED");
+			
             image
-            //.filter()
-            .write_file(&format!(
-                "{}_{}.ppm",
-                image_config.name, image_config.samples_per_pixel
-            ))
-            .expect("YOU FAILED");
-
+                .median_filter(3)
+                .write_file(&format!(
+                    "{}_{}_f.ppm",
+                    image_config.name, image_config.samples_per_pixel
+                ))
+                .expect("YOU FAILED");
+			
+			image
+                .box_filter()
+                .write_file(&format!(
+                    "{}_{}_b.ppm",
+                    image_config.name, image_config.samples_per_pixel
+                ))
+                .expect("YOU FAILED");
+			
             println!(
                 "{} milliseconds for {} rays.",
                 now.elapsed().as_millis(),

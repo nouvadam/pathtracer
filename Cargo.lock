@@ -291,6 +291,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "pathtracer"
+version = "0.1.0"
+dependencies = [
+ "arr_macro",
+ "itertools",
+ "num-traits",
+ "objekt-clonable",
+ "permutation_iterator",
+ "png",
+ "rand 0.6.5",
+ "rayon",
+ "wavefront_obj",
+]
+
+[[package]]
 name = "permutation_iterator"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -529,21 +544,6 @@ dependencies = [
  "crossbeam-utils",
  "lazy_static",
  "num_cpus",
-]
-
-[[package]]
-name = "raytracer"
-version = "0.1.0"
-dependencies = [
- "arr_macro",
- "itertools",
- "num-traits",
- "objekt-clonable",
- "permutation_iterator",
- "png",
- "rand 0.6.5",
- "rayon",
- "wavefront_obj",
 ]
 
 [[package]]

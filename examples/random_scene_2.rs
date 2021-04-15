@@ -1,9 +1,9 @@
+use pathtracer::hitables::*;
+use pathtracer::material::*;
+use pathtracer::primitive::*;
+use pathtracer::texture::*;
+use pathtracer::*;
 use rand::Rng;
-use raytracer::*;
-use raytracer::material::*;
-use raytracer::primitive::*;
-use raytracer::texture::*;
-use raytracer::hitables::*;
 fn main() {
     let mut hitable = HitableList::new();
     let mut seed = rand::thread_rng();
@@ -94,11 +94,10 @@ fn main() {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 64,
         },
-        name: "random_scene_2"
+        name: "random_scene_2",
     };
 
     Scene {
-        
         camera: Camera::new(
             V3::new(13.0, 2.0, 3.0), //lookfrom
             V3::new(0.0, 0.0, 0.0),  //lookat
@@ -110,7 +109,7 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable)
+        world: Box::new(hitable),
     }
     .loop_render(image_config, 12);
 }

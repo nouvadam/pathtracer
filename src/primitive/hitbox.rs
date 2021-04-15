@@ -2,9 +2,9 @@ use crate::hit::*;
 use crate::hitables::HitableList;
 use crate::hitables::AABB;
 use crate::material::Material;
-use crate::V3;
 use crate::primitive::rectangle::*;
 use crate::ray::*;
+use crate::V3;
 /// Cuboid made from rectangles.
 #[derive(Clone)]
 pub struct HitBox {

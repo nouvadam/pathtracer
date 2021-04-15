@@ -1,6 +1,6 @@
-use crate::V3;
 use crate::misc::Perlin;
 use crate::texture::Texture;
+use crate::V3;
 /// Perlin noise texture.
 #[derive(Clone)]
 pub struct PerlinNoiseTexture {

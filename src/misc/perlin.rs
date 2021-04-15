@@ -79,7 +79,7 @@ impl Perlin {
     /// Composite noise that has multiple summed frequencies.
     ///
     /// `point` - Point on the object.
-    /// 
+    ///
     /// `depth` - How many calls to noise method is used.
     pub fn turbulence(&self, point: V3<f32>, depth: i32) -> f32 {
         (0..depth)

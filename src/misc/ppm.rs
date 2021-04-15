@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 /// PPM file format.
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct PPM {
     /// Height of the image.
     pub height: u32,
@@ -24,13 +24,29 @@ impl PPM {
             data,
         }
     }
-
+	
+	/// Returns new PPM object created from `rgb` vector.
+	pub fn new_from_vec(height: u32, width: u32, rgb: Vec<u8>) -> Result<PPM, &'static str> {
+		let size = 3*height*width;
+		
+		use std::convert::TryInto;
+		if size != rgb.len().try_into().unwrap() {
+			return Err("Invalid rgb vector size.");
+		} else {
+			Ok(PPM {
+				height,
+				width,
+				data: rgb
+			})
+		}
+	}
+	
     fn buffer_size(&self) -> u32 {
         3 * self.height * self.width
     }
 
     fn get_offset(&self, x: u32, y: u32) -> Option<usize> {
-        let offset = (((self.height-1)- y) * self.width * 3) + (x * 3);
+        let offset = (((self.height - 1) - y) * self.width * 3) + (x * 3);
         if offset < self.buffer_size() {
             Some(offset as usize)
         } else {

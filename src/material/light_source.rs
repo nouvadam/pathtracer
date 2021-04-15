@@ -1,8 +1,8 @@
 use crate::hit::Hit;
 use crate::material::*;
-use crate::V3;
 use crate::ray::Ray;
 use crate::texture::Texture;
+use crate::V3;
 /// Emits light.
 #[derive(Clone)]
 pub struct LightSource {

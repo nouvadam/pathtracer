@@ -1,5 +1,5 @@
-use crate::{Ray, V3, Hit, Hitable};
 use crate::hitables::AABB;
+use crate::{Hit, Hitable, Ray, V3};
 
 /// Represents a Hitable object that was rotated by some angle around some axis.
 #[derive(Clone)]

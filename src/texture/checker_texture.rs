@@ -1,5 +1,5 @@
-use crate::V3;
 use crate::texture::Texture;
+use crate::V3;
 /// Checker texture.
 #[derive(Clone)]
 pub struct CheckerTexture {

@@ -1,5 +1,5 @@
-use crate::V3;
 use crate::texture::Texture;
+use crate::V3;
 /// Texture that represents some sort of rasterized image.
 #[derive(Clone)]
 pub struct ImageTexture {

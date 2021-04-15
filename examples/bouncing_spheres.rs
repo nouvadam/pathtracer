@@ -1,10 +1,10 @@
+use pathtracer::hitables::{BvhNode, HitableList};
+use pathtracer::material::{Dielectric, Lambertian, Metalic};
+use pathtracer::misc::Perlin;
+use pathtracer::primitive::{MovingSphere, Sphere};
+use pathtracer::texture::{CheckerTexture, ConstantTexture, PerlinNoiseTexture};
+use pathtracer::*;
 use rand::Rng;
-use raytracer::*;
-use raytracer::misc::Perlin;
-use raytracer::hitables::{HitableList,BvhNode};
-use raytracer::primitive::{Sphere, MovingSphere};
-use raytracer::material::{Dielectric, Lambertian, Metalic};
-use raytracer::texture::{CheckerTexture, ConstantTexture, PerlinNoiseTexture};
 
 pub fn main() {
     let mut hitable = HitableList::new();
@@ -117,11 +117,10 @@ pub fn main() {
             background_color: V3::new(0.5, 0.7, 1.0),
             depth: 32,
         },
-        name: "bouncing_spheres"
+        name: "bouncing_spheres",
     };
 
     let scene = Scene {
-        
         camera: Camera::new(
             V3::new(13.0, 2.0, 3.0), //lookfrom
             V3::new(0.0, 0.0, 0.0),  //lookat
@@ -133,7 +132,7 @@ pub fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable)
+        world: Box::new(hitable),
     };
 
     scene.loop_render(image_config, 8);

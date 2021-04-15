@@ -1,4 +1,4 @@
-use crate::{V3, Ray, RaySetting};
+use crate::{Ray, RaySetting, V3};
 use rand::Rng;
 /// Lens-based camera.
 pub struct Camera {

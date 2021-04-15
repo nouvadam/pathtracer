@@ -1,9 +1,9 @@
-use raytracer::*;
-use raytracer::material::*;
-use raytracer::primitive::*;
-use raytracer::texture::*;
-use raytracer::transform::*;
-use raytracer::hitables::*;
+use pathtracer::hitables::*;
+use pathtracer::material::*;
+use pathtracer::primitive::*;
+use pathtracer::texture::*;
+use pathtracer::transform::*;
+use pathtracer::*;
 
 use rand::Rng;
 
@@ -49,11 +49,10 @@ fn main() {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 32,
         },
-        name: r#"funky_monkey"#
+        name: r#"funky_monkey"#,
     };
 
     Scene {
-        
         camera: Camera::new(
             V3::new(0.0, 0.0, 0.0),  //lookfrom
             V3::new(0.0, 0.0, -1.0), //lookat
@@ -65,7 +64,7 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable)
+        world: Box::new(hitable),
     }
     .loop_render(image_config, 12);
 }
