@@ -27,6 +27,5 @@ To use this path tracer in your project, paste this to `Cargo.toml`:
 [dependencies]
 pathtracer = { git = "https://github.com/nouvadam/pathtracer/", branch = "main"}
 ```
-To check out the documentation, first generate one by:
-`cargo doc`
-then open `target/doc/pathtracer/index.html` file.
+To check out the documentation, generate and open one by:
+`cargo doc --open`
