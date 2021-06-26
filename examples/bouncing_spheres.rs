@@ -1,5 +1,5 @@
-use pathtracer::hitables::{BvhNode, HitableList};
-use pathtracer::material::{Dielectric, Lambertian, Metalic};
+use pathtracer::hittables::{BvhNode, HittableList};
+use pathtracer::material::{Dielectric, Lambertian, MaterialContainer, Metalic};
 use pathtracer::misc::Perlin;
 use pathtracer::primitive::{MovingSphere, Sphere};
 use pathtracer::texture::{CheckerTexture, ConstantTexture, PerlinNoiseTexture};
@@ -7,7 +7,8 @@ use pathtracer::*;
 use rand::Rng;
 
 pub fn main() {
-    let mut hitable = HitableList::new();
+    let mut hittable = HittableList::new();
+    let mut materials = MaterialContainer::new();
     let mut seed = rand::thread_rng();
 
     let checker_texture = CheckerTexture {
@@ -24,14 +25,13 @@ pub fn main() {
         scale: 5.0,
     };
 
-    hitable.add(Box::new(Sphere {
-        center: V3::new(0.0, -1000.0, 0.0),
-        radius: 1000.0,
-        material: Box::new(Lambertian {
-            albedo: Box::new(perlin_texture),
-        }),
-    }));
-    let mut hitable2 = HitableList::new();
+    let glass_material = materials.add(Dielectric::new(1.5));
+
+    let material = materials.add(Lambertian::new(Box::new(perlin_texture)));
+
+    hittable.add(Sphere::new(V3::new(0.0, -1000.0, 0.0), 1000.0, material));
+
+    let mut hittable2 = HittableList::new();
     for a in -15..15 {
         for b in -15..15 {
             let choose_mat: f32 = seed.gen();
@@ -40,74 +40,55 @@ pub fn main() {
                 0.2,
                 (b as f32) + 0.9 * seed.gen::<f32>(),
             );
-            if (center - V3::new(4.0, 0.2, 0.0)).len() > 0.9 {
+            if (center - V3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.75 {
                     let center2 = center + V3::new(0.0, seed.gen_range(0.0, 0.5), 0.0);
 
-                    hitable2.add(Box::new(MovingSphere {
-                        centers: (center, center2),
-                        time_range: (0.0, 1.0),
-                        radius: 0.2,
-                        material: Box::new(Lambertian {
-                            albedo: Box::new(ConstantTexture {
-                                color: V3::new(
-                                    seed.gen::<f32>() * seed.gen::<f32>(),
-                                    seed.gen::<f32>() * seed.gen::<f32>(),
-                                    seed.gen::<f32>() * seed.gen::<f32>(),
-                                ),
-                            }),
-                        }),
-                    }));
+                    let material = materials.add(Lambertian::new(Box::new(ConstantTexture {
+                        color: V3::new(
+                            seed.gen::<f32>() * seed.gen::<f32>(),
+                            seed.gen::<f32>() * seed.gen::<f32>(),
+                            seed.gen::<f32>() * seed.gen::<f32>(),
+                        ),
+                    })));
+
+                    hittable2.add(MovingSphere::new(
+                        (center, center2),
+                        (0.0, 1.0),
+                        0.2,
+                        material,
+                    ));
                 } else if choose_mat < 0.83 {
-                    hitable2.add(Box::new(Sphere {
-                        center,
-                        radius: 0.2,
-                        material: Box::new(Metalic {
-                            albedo: V3::new(
-                                0.5 * (1.0 + seed.gen::<f32>()),
-                                0.5 * (1.0 + seed.gen::<f32>()),
-                                0.5 * (1.0 + seed.gen::<f32>()),
-                            ),
-                            fuzz: 0.5 * seed.gen::<f32>(),
-                        }),
-                    }));
+                    let material = materials.add(Metalic::new(
+                        V3::new(
+                            0.5 * (1.0 + seed.gen::<f32>()),
+                            0.5 * (1.0 + seed.gen::<f32>()),
+                            0.5 * (1.0 + seed.gen::<f32>()),
+                        ),
+                        0.5 * seed.gen::<f32>(),
+                    ));
+
+                    hittable2.add(Sphere::new(center, 0.2, material));
                 } else {
-                    hitable2.add(Box::new(Sphere {
-                        center,
-                        radius: 0.2,
-                        material: Box::new(Dielectric {
-                            refractive_index: 1.5,
-                        }),
-                    }));
+                    hittable2.add(Sphere::new(center, 0.2, glass_material));
                 }
             }
         }
     }
 
-    hitable2.add(Box::new(Sphere {
-        center: V3::new(-4.0, 1.0, 0.0),
-        radius: 1.0,
-        material: Box::new(Lambertian {
-            albedo: Box::new(checker_texture),
-        }),
-    }));
-    hitable2.add(Box::new(Sphere {
-        center: V3::new(4.0, 1.0, 0.0),
-        radius: 1.0,
-        material: Box::new(Metalic {
-            albedo: V3::new(0.7, 0.6, 0.5),
-            fuzz: 0.0,
-        }),
-    }));
-    hitable2.add(Box::new(Sphere {
-        center: V3::new(0.0, 1.0, 0.0),
-        radius: 1.0,
-        material: Box::new(Dielectric {
-            refractive_index: 1.5,
-        }),
-    }));
+    hittable2.add(Sphere::new(
+        V3::new(-4.0, 1.0, 0.0),
+        1.0,
+        materials.add(Lambertian::new(Box::new(checker_texture))),
+    ));
+    hittable2.add(Sphere::new(
+        V3::new(4.0, 1.0, 0.0),
+        1.0,
+        materials.add(Metalic::new(V3::new(0.7, 0.6, 0.5), 0.0)),
+    ));
+    hittable2.add(Sphere::new(V3::new(0.0, 1.0, 0.0), 1.0, glass_material));
 
-    hitable.add(Box::new(BvhNode::new(hitable2)));
+    hittable.add(Primitive::BvhNode(BvhNode::new(&hittable2)));
 
     let image_config = ImageConfig {
         nx: 2048,
@@ -132,7 +113,9 @@ pub fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable),
+        world: BvhNode::new(&hittable),
+        lights: None,
+        materials,
     };
 
     scene.loop_render(image_config, 8);

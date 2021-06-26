@@ -1,22 +1,24 @@
 use itertools::*;
 use rand::Rng;
 
-use pathtracer::hitables::*;
+use pathtracer::hittables::*;
 use pathtracer::material::*;
 use pathtracer::misc::*;
-use pathtracer::primitive::*;
 use pathtracer::texture::*;
 use pathtracer::transform::*;
 use pathtracer::*;
 
 fn main() {
-    let mut boxes = HitableList::new();
+    let mut boxes = HittableList::new();
+    let mut objects = HittableList::new();
+    let mut lights = HittableList::new();
+    let mut materials = MaterialContainer::new();
 
-    let ground = Lambertian {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(0.48, 0.83, 0.53),
-        }),
-    };
+    let glass_material = materials.add(Dielectric::new(1.5));
+
+    let ground = materials.add(Lambertian::new(Box::new(ConstantTexture {
+        color: V3::new(0.48, 0.83, 0.53),
+    })));
 
     let boxes_per_side = 20;
 
@@ -29,149 +31,109 @@ fn main() {
         let y1 = rand::thread_rng().gen_range(1.0, 101.0);
         let z1 = z0 + w;
 
-        boxes.add(Box::new(HitBox::new(
+        boxes.add(HitBox::new(
             V3::new(x0, y0, z0),
             V3::new(x1, y1, z1),
-            Box::new(ground.clone()),
-        )))
+            ground,
+        ))
     });
 
-    let mut objects = HitableList::new();
+    objects.add(Primitive::BvhNode(BvhNode::new(&boxes)));
 
-    objects.add(Box::new(BvhNode::new(boxes)));
+    let light = materials.add(LightSource::new(Box::new(ConstantTexture {
+        color: V3::new(7.0, 7.0, 7.0),
+    })));
 
-    let light = LightSource {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(7.0, 7.0, 7.0),
-        }),
-    };
+    objects.add(XZrect::new(123.0, 423.0, 147.0, 412.0, 554.0, light).flip_face());
 
-    objects.add(Box::new(XZrect {
-        x0: 123.0,
-        x1: 423.0,
-        z0: 147.0,
-        z1: 412.0,
-        k: 554.0,
-        material: Box::new(light),
-    }));
+    lights.add(XZrect::new(123.0, 423.0, 147.0, 412.0, 554.0, light).flip_face());
 
     let moving_sphere_material = ConstantTexture {
         color: V3::new(0.7, 0.3, 0.1),
     };
 
-    objects.add(Box::new(MovingSphere {
-        centers: (V3::new(400.0, 400.0, 200.0), V3::new(430.0, 400.0, 200.0)),
-        time_range: (0.0, 1.0),
-        radius: 50.0,
-        material: Box::new(Lambertian {
-            albedo: Box::new(moving_sphere_material),
-        }),
-    }));
+    objects.add(MovingSphere::new(
+        (V3::new(400.0, 400.0, 200.0), V3::new(430.0, 400.0, 200.0)),
+        (0.0, 1.0),
+        50.0,
+        materials.add(Lambertian::new(Box::new(moving_sphere_material))),
+    ));
 
-    objects.add(Box::new(Sphere {
-        center: V3::new(260.0, 150.0, 45.0),
-        radius: 50.0,
-        material: Box::new(Dielectric {
-            refractive_index: 1.5,
-        }),
-    }));
+    objects.add(Sphere::new(
+        V3::new(260.0, 150.0, 45.0),
+        50.0,
+        glass_material,
+    ));
 
-    objects.add(Box::new(Sphere {
-        center: V3::new(360.0, 150.0, 145.0),
-        radius: 70.0,
-        material: Box::new(Dielectric {
-            refractive_index: 1.5,
-        }),
-    }));
+    objects.add(Sphere::new(
+        V3::new(360.0, 150.0, 145.0),
+        70.0,
+        glass_material,
+    ));
 
     objects.add(
-        Box::new(Sphere {
-            center: V3::new(360.0, 150.0, 145.0),
-            radius: 70.0,
-            material: Box::new(Dielectric {
-                refractive_index: 1.5,
-            }),
-        })
-        .into_constant_medium(
+        Sphere::new(V3::new(360.0, 150.0, 145.0), 70.0, glass_material).into_constant_medium(
             0.2,
-            Box::new(Isotropic {
-                albedo: Box::new(ConstantTexture {
-                    color: V3::new(0.2, 0.4, 0.9),
-                }),
-            }),
+            materials.add(Isotropic::new(Box::new(ConstantTexture {
+                color: V3::new(0.2, 0.4, 0.9),
+            }))),
         ),
     );
 
     objects.add(
-        Box::new(Sphere {
-            center: V3::new(0.0, 0.0, 0.0),
-            radius: 5000.0,
-            material: Box::new(Dielectric {
-                refractive_index: 1.5,
-            }),
-        })
-        .into_constant_medium(
+        Sphere::new(V3::new(0.0, 0.0, 0.0), 5000.0, glass_material).into_constant_medium(
             0.0001,
-            Box::new(Isotropic {
-                albedo: Box::new(ConstantTexture {
-                    color: V3::new(1.0, 1.0, 1.0),
-                }),
-            }),
+            materials.add(Isotropic::new(Box::new(ConstantTexture {
+                color: V3::new(1.0, 1.0, 1.0),
+            }))),
         ),
     );
 
-    objects.add(Box::new(Sphere {
-        center: V3::new(400.0, 200.0, 400.0),
-        radius: 100.0,
-        material: Box::new(Lambertian {
-            albedo: Box::new(ImageTexture::new("assets/earthmap.png")),
-        }),
-    }));
+    objects.add(Sphere::new(
+        V3::new(400.0, 200.0, 400.0),
+        100.0,
+        materials.add(Lambertian::new(Box::new(ImageTexture::new(
+            "assets/earthmap.png",
+        )))),
+    ));
 
-    objects.add(Box::new(Sphere {
-        center: V3::new(0.0, 150.0, 145.0),
-        radius: 50.0,
-        material: Box::new(Metalic {
-            albedo: V3::new(0.8, 0.8, 0.9),
-            fuzz: 1.0,
-        }),
-    }));
+    objects.add(Sphere::new(
+        V3::new(0.0, 150.0, 145.0),
+        50.0,
+        materials.add(Metalic::new(V3::new(0.8, 0.8, 0.9), 1.0)),
+    ));
 
     let perlin_texture = PerlinNoiseTexture {
         perlin_noise: Perlin::new(),
         scale: 0.1,
     };
 
-    objects.add(Box::new(Sphere {
-        center: V3::new(220.0, 280.0, 300.0),
-        radius: 80.0,
-        material: Box::new(Lambertian {
-            albedo: Box::new(perlin_texture),
-        }),
-    }));
+    objects.add(Sphere::new(
+        V3::new(220.0, 280.0, 300.0),
+        80.0,
+        materials.add(Lambertian::new(Box::new(perlin_texture))),
+    ));
 
-    let mut boxes2 = HitableList::new();
+    let mut boxes2 = HittableList::new();
 
-    let white = Lambertian {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(0.73, 0.73, 0.73),
-        }),
-    };
+    let white = materials.add(Lambertian::new(Box::new(ConstantTexture {
+        color: V3::new(0.73, 0.73, 0.73),
+    })));
 
     (0..1000).for_each(|_x| {
-        boxes2.add(Box::new(Sphere {
-            center: V3::new(
+        boxes2.add(Sphere::new(
+            V3::new(
                 rand::thread_rng().gen_range(0.0, 165.0),
                 rand::thread_rng().gen_range(0.0, 165.0),
                 rand::thread_rng().gen_range(0.0, 165.0),
             ),
-            radius: 10.0,
-            material: Box::new(white.clone()),
-        }));
+            10.0,
+            white,
+        ));
     });
 
     objects.add(
-        Box::new(BvhNode::new(boxes2))
+        Primitive::BvhNode(BvhNode::new(&boxes2))
             .rotate(V3::new(0.0, 1.0, 0.0), 0.261_799_4)
             .translate(V3::new(-100.0, 270.0, 395.0)),
     );
@@ -199,7 +161,9 @@ fn main() {
             0.0,                           //time0
             1.0,                           //time1
         ),
-        world: Box::new(objects),
+        world: BvhNode::new(&objects),
+        lights: Some(lights),
+        materials,
     };
 
     scene.loop_render(image_config, 12);

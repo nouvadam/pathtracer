@@ -1,4 +1,4 @@
-use pathtracer::hitables::*;
+use pathtracer::hittables::*;
 use pathtracer::material::*;
 use pathtracer::primitive::*;
 use pathtracer::texture::*;
@@ -10,34 +10,48 @@ use rand::Rng;
 // Blender monkey
 
 fn main() {
-    let mut hitable = HitableList::new();
+    let mut hittable = HittableList::new();
+    let mut lights = HittableList::new();
+    let mut materials = MaterialContainer::new();
 
     let scale = 2.0;
     let mut seed = rand::thread_rng();
 
-    let glass_material = Box::new(Dielectric {
-        refractive_index: 1.5,
-    });
+    let glass_material = materials.add(Dielectric::new(1.5));
 
-    hitable.add(
-        Box::new(XYrect {
-            x0: -5.0,
-            x1: 5.0,
-            y0: -5.0,
-            y1: 5.0,
-            k: 0.0,
-            material: Box::new(LightSource {
-                albedo: Box::new(PlasmaTexture {
-                    param: seed.gen::<f32>() * 100.0,
-                    scale,
-                }),
-            }),
-        })
+    hittable.add(
+        XYrect::new(
+            -5.0,
+            5.0,
+            -5.0,
+            5.0,
+            0.0,
+            materials.add(LightSource::new(Box::new(PlasmaTexture {
+                param: seed.gen::<f32>() * 100.0,
+                scale,
+            }))),
+        )
         .translate(V3::new(0.0, 0.0, -10.0)),
     );
 
-    hitable.add(
-        Box::new(Mesh::new("assets/monkey (2).obj", glass_material).unwrap())
+    lights.add(
+        XYrect::new(
+            -5.0,
+            5.0,
+            -5.0,
+            5.0,
+            0.0,
+            materials.add(LightSource::new(Box::new(PlasmaTexture {
+                param: seed.gen::<f32>() * 100.0,
+                scale,
+            }))),
+        )
+        .translate(V3::new(0.0, 0.0, -10.0)),
+    );
+
+    hittable.add(
+        Mesh::new("assets/monkey (2).obj", glass_material)
+            .unwrap()
             .translate(V3::new(0.0, 0.0, -4.0)),
     );
 
@@ -64,7 +78,9 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable),
+        world: BvhNode::new(&hittable),
+        lights: None,
+        materials,
     }
     .loop_render(image_config, 12);
 }

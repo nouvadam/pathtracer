@@ -1,4 +1,4 @@
-use pathtracer::hitables::*;
+use pathtracer::hittables::*;
 use pathtracer::material::*;
 use pathtracer::primitive::*;
 use pathtracer::texture::*;
@@ -8,47 +8,68 @@ use pathtracer::*;
 use rand::Rng;
 
 fn main() {
-    let mut hitable = HitableList::new();
+    let mut hittable = HittableList::new();
+    let mut lights = HittableList::new();
+    let mut materials = MaterialContainer::new();
 
-    hitable.add(Box::new(Sphere {
-        center: V3::new(0.0, -100.5, -2.0),
-        radius: 100.0,
-        material: Box::new(Lambertian {
-            albedo: Box::new(ConstantTexture {
-                color: V3::new(0.5, 0.5, 0.5),
-            }),
-        }),
-    }));
+    hittable.add(Sphere::new(
+        V3::new(0.0, -100.5, -2.0),
+        100.0,
+        materials.add(Lambertian::new(Box::new(ConstantTexture {
+            color: V3::new(0.5, 0.5, 0.5),
+        }))),
+    ));
 
     let scale = 2.0;
     let mut seed = rand::thread_rng();
 
-    hitable.add(Box::new(Sphere {
-        center: V3::new(-1.0, 0.0, -2.0),
-        radius: 0.5,
-        material: Box::new(LightSource {
-            albedo: Box::new(PlasmaTexture {
-                param: seed.gen::<f32>() * 100.0,
-                scale,
-            }),
-        }),
-    }));
+    hittable.add(Sphere::new(
+        V3::new(-1.0, 0.0, -2.0),
+        0.5,
+        materials.add(LightSource::new(Box::new(PlasmaTexture {
+            param: seed.gen::<f32>() * 100.0,
+            scale,
+        }))),
+    ));
 
-    hitable.add(
-        Box::new(XYrect {
-            x0: -0.5,
-            x1: 0.5,
-            y0: -0.5,
-            y1: 0.5,
-            k: 0.0,
-            material: Box::new(LightSource {
-                albedo: Box::new(PlasmaTexture {
-                    param: seed.gen::<f32>() * 100.0,
-                    scale: 1.0,
-                }),
-            }),
-        })
-        .rotate(V3::new(0.0, 1.0, 0.0), -0.8)
+    lights.add(Sphere::new(
+        V3::new(-1.0, 0.0, -2.0),
+        0.5,
+        materials.add(LightSource::new(Box::new(PlasmaTexture {
+            param: seed.gen::<f32>() * 100.0,
+            scale,
+        }))),
+    ));
+
+    hittable.add(
+        XYrect::new(
+            -0.5,
+            0.5,
+            -0.5,
+            0.5,
+            0.0,
+            materials.add(LightSource::new(Box::new(PlasmaTexture {
+                param: seed.gen::<f32>() * 100.0,
+                scale: 1.0,
+            }))),
+        )
+        //.rotate(V3::new(0.0, 1.0, 0.0), -0.8)
+        .translate(V3::new(0.5, 0.0, -2.0)),
+    );
+
+    lights.add(
+        XYrect::new(
+            -0.5,
+            0.5,
+            -0.5,
+            0.5,
+            0.0,
+            materials.add(LightSource::new(Box::new(PlasmaTexture {
+                param: seed.gen::<f32>() * 100.0,
+                scale: 1.0,
+            }))),
+        )
+        //.rotate(V3::new(0.0, 1.0, 0.0), -0.8)
         .translate(V3::new(0.5, 0.0, -2.0)),
     );
 
@@ -75,7 +96,9 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable),
+        world: BvhNode::new(&hittable),
+        lights: Some(lights),
+        materials,
     }
     .loop_render(image_config, 12);
 }

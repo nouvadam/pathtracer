@@ -15,9 +15,9 @@ pub struct Perlin {
 impl Perlin {
     /// Returns new perlin n
     pub fn new() -> Perlin {
-        let mut hashed_iter_x = Permutor::new(256 as u64);
-        let mut hashed_iter_y = Permutor::new(256 as u64);
-        let mut hashed_iter_z = Permutor::new(256 as u64);
+        let mut hashed_iter_x = Permutor::new(256_u64);
+        let mut hashed_iter_y = Permutor::new(256_u64);
+        let mut hashed_iter_z = Permutor::new(256_u64);
 
         Perlin {
             perlin: arr![V3::random(); 256],
@@ -88,5 +88,11 @@ impl Perlin {
                 acc + (1.0 / x) * self.noise_with_trilinear_interpolating(point * x)
             })
             .abs()
+    }
+}
+
+impl Default for Perlin {
+    fn default() -> Self {
+        Self::new()
     }
 }

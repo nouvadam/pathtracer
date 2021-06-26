@@ -1,5 +1,7 @@
-use crate::misc::PPM;
-use crate::{Camera, Hitable, RaySetting, V3};
+use crate::hittables::{BvhNode, HittableList};
+use crate::material::MaterialContainer;
+use crate::misc::Ppm;
+use crate::{Camera, RaySetting, V3};
 
 use itertools::*;
 use rand::Rng;
@@ -26,25 +28,29 @@ pub struct Scene {
     /// Camera
     pub camera: Camera,
     /// Scene to render
-    pub world: Box<dyn Hitable>,
+    pub world: BvhNode,
+    /// Lights
+    pub lights: Option<HittableList>,
+    /// Materials
+    pub materials: MaterialContainer,
 }
 /// Enables rendering into file.
 pub trait Render {
-    /// Renders scene into PPM struct, which could later be saved into file.
+    /// Renders scene into Ppm struct, which could later be saved into file.
     ///
     /// `image_config` - Configuration of rendered image.
-    fn render(&self, image_config: ImageConfig) -> PPM;
+    fn render(&self, image_config: ImageConfig) -> Ppm;
     /// Renders Scene multiple time, each time with better quality, and saves images into files.
     ///
     /// `image_config` - Starting configuration of rendered image.
     ///
     /// `iterations` - How many times image should be rendered, each consequtive time number of rays increases by the factor of 2.
-    fn loop_render(&self, image_config: ImageConfig, iterations: u16) -> ();
+    fn loop_render(&self, image_config: ImageConfig, iterations: u16);
 }
 
 impl Render for Scene {
-    fn render(&self, image_config: ImageConfig) -> PPM {
-        let mut output_file = PPM::new(image_config.ny, image_config.nx);
+    fn render(&self, image_config: ImageConfig) -> Ppm {
+        let mut output_file = Ppm::new(image_config.ny, image_config.nx);
 
         // Create vector of pixels; first two u32 values are pixel's x and y coordinate, and V3 is color of the pixel.
         let pixels: Vec<(u32, u32, V3<f32>)> = iproduct!(0..image_config.ny, 0..image_config.nx)
@@ -63,17 +69,25 @@ impl Render for Scene {
                         + self
                             .camera
                             .get_ray(u, v, &image_config.ray_setting)
-                            .get_color(&*self.world);
+                            .get_color(&self);
                 }
 
                 (pixel.1, pixel.0, color)
             })
             .collect();
 
-        // Puts vector of pixels into PPM struct
+        // Puts vector of pixels into Ppm struct
         for pixel in pixels {
             // Average color of subpixels
-            let mut color = pixel.2 / (image_config.samples_per_pixel as f32);
+            let scale = 1.0 / (image_config.samples_per_pixel as f32);
+
+            let color_without_nan: V3<f32> = pixel
+                .2
+                .into_iter()
+                .map(|color| if color.is_nan() { 0.0 } else { color })
+                .collect();
+
+            let mut color = color_without_nan * scale;
 
             //normalize
             if color.x > 1.0 {
@@ -93,9 +107,9 @@ impl Render for Scene {
             }
 
             let color = V3::new(
-                (color.x.sqrt() * 255.99) as u8,
-                (color.y.sqrt() * 255.99) as u8,
-                (color.z.sqrt() * 255.99) as u8,
+                (color.x.sqrt().clamp(0.0, 0.999) * 254.99) as u8,
+                (color.y.sqrt().clamp(0.0, 0.999) * 254.99) as u8,
+                (color.z.sqrt().clamp(0.0, 0.999) * 254.99) as u8,
             );
 
             output_file.set_pixel(pixel.0, pixel.1, color);
@@ -104,37 +118,28 @@ impl Render for Scene {
         output_file
     }
 
-    fn loop_render(&self, image_config: ImageConfig, iterations: u16) -> () {
+    fn loop_render(&self, image_config: ImageConfig, iterations: u16) {
         let mut image_config = ImageConfig { ..image_config };
 
         for _i in 0..iterations {
             let now = Instant::now();
 
             let image = self.render(image_config);
-			
-			image
+
+            image
                 .write_file(&format!(
                     "{}_{}.ppm",
                     image_config.name, image_config.samples_per_pixel
                 ))
                 .expect("YOU FAILED");
-			
             image
-                .median_filter(3)
+                .median_filter(1)
                 .write_file(&format!(
-                    "{}_{}_f.ppm",
+                    "{}_{}_median_1.ppm",
                     image_config.name, image_config.samples_per_pixel
                 ))
                 .expect("YOU FAILED");
-			
-			image
-                .box_filter()
-                .write_file(&format!(
-                    "{}_{}_b.ppm",
-                    image_config.name, image_config.samples_per_pixel
-                ))
-                .expect("YOU FAILED");
-			
+
             println!(
                 "{} milliseconds for {} rays.",
                 now.elapsed().as_millis(),

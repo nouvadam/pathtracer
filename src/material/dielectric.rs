@@ -1,8 +1,10 @@
 use crate::hit::Hit;
 use crate::material::*;
+use crate::misc::ZeroPdf;
 use crate::ray::Ray;
 use crate::V3;
 use rand::Rng;
+
 /// Struct representing dielectrics, in form of glass.
 #[derive(Clone)]
 pub struct Dielectric {
@@ -10,8 +12,8 @@ pub struct Dielectric {
     pub refractive_index: f32,
 }
 
-impl Material for Dielectric {
-    fn scatter<'a>(&self, ray: &'a Ray, hit: &Hit) -> Option<(Ray<'a>, V3<f32>, bool)> {
+impl MaterialTrait for Dielectric {
+    fn scatter<'a>(&self, ray: &'a Ray, hit: &Hit) -> Option<ScatterRecord<'a>> {
         let etai_over_etat = if hit.front_face {
             1.0 / self.refractive_index
         } else {
@@ -34,14 +36,29 @@ impl Material for Dielectric {
             direction = refract(unit_direction, hit.normal, etai_over_etat);
         }
 
-        Some((
-            Ray {
+        Some(ScatterRecord {
+            specular_ray: Some(Ray {
                 origin: hit.point,
                 end: direction,
                 ..*ray
-            },
-            V3::new(1.0, 1.0, 1.0),
-            false,
-        ))
+            }),
+            attenuation: V3::new(1.0, 1.0, 1.0),
+            pdf: Box::new(ZeroPdf),
+        })
+    }
+
+    fn scattering_pdf<'a>(&self, _ray_in: &'a Ray, _hit: &Hit, _ray_scattered: &Ray) -> f32 {
+        todo!()
+    }
+
+    fn color_emitted<'a>(&self, _ray_in: &'a Ray, _hit: &Hit) -> V3<f32> {
+        todo!()
+    }
+}
+
+impl Dielectric {
+    /// Returns new Dielectric material.
+    pub fn new(refractive_index: f32) -> Material {
+        Material::Dielectric(Dielectric { refractive_index })
     }
 }

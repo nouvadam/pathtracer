@@ -14,7 +14,6 @@ fn main() {
     let red = materials.add(Lambertian::new(Box::new(ConstantTexture {
         color: V3::new(0.65, 0.05, 0.05),
     })));
-
     let white = materials.add(Lambertian::new(Box::new(ConstantTexture {
         color: V3::new(0.73, 0.73, 0.73),
     })));
@@ -25,12 +24,15 @@ fn main() {
         color: V3::new(15.0, 15.0, 15.0),
     })));
 
+    let aluminium = materials.add(Metalic::new(V3::new(0.8, 0.85, 0.88), 0.0));
+
+    let glass = materials.add(Dielectric::new(1.5));
+
     hittable.add(YZrect::new(0.0, 555.0, 0.0, 555.0, 555.0, green));
 
     hittable.add(YZrect::new(0.0, 555.0, 0.0, 555.0, 0.0, red));
 
     hittable.add(XZrect::new(213.0, 343.0, 227.0, 332.0, 554.0, light).flip_face());
-    lights.add(XZrect::new(213.0, 343.0, 227.0, 332.0, 554.0, light).flip_face());
 
     hittable.add(XZrect::new(0.0, 555.0, 0.0, 555.0, 0.0, white));
 
@@ -39,16 +41,34 @@ fn main() {
     hittable.add(XYrect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
 
     hittable.add(
-        HitBox::new(V3::new(0.0, 0.0, 0.0), V3::new(165.0, 330.0, 165.0), white)
-            .rotate(V3::new(0.0, 1.0, 0.0), 0.261_799_4)
-            .translate(V3::new(265.0, 0.0, 295.0)),
+        HitBox::new(
+            V3::new(0.0, 0.0, 0.0),
+            V3::new(165.0, 330.0, 165.0),
+            aluminium,
+        )
+        .rotate(V3::new(0.0, 1.0, 0.0), 0.261_799_4)
+        .translate(V3::new(265.0, 0.0, 295.0)),
     );
 
-    hittable.add(
-        HitBox::new(V3::new(0.0, 0.0, 0.0), V3::new(165.0, 165.0, 165.0), white)
-            .rotate(V3::new(0.0, 1.0, 0.0), -0.314_159_27)
-            .translate(V3::new(130.0, 0.0, 65.0)),
-    );
+    /*hittable.add(
+        Primitive::HitBox(HitBox::new(
+            V3::new(0.0, 0.0, 0.0),
+            V3::new(165.0, 165.0, 165.0),
+            &white,
+        ))
+        .rotate(V3::new(0.0, 1.0, 0.0), -0.314_159_27)
+        .translate(V3::new(130.0, 0.0, 65.0)),
+    );*/
+
+    hittable.add(Sphere::new(V3::new(190.0, 90.0, 190.0), 90.0, glass));
+
+    lights.add(XZrect::new(213.0, 343.0, 227.0, 332.0, 554.0, light).flip_face());
+
+    lights.add(Primitive::Sphere(Sphere {
+        center: V3::new(190.0, 90.0, 190.0),
+        radius: 90.0,
+        material: glass,
+    }));
 
     let image_config = ImageConfig {
         nx: 1024,
@@ -58,7 +78,7 @@ fn main() {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 32,
         },
-        name: "cornell_box",
+        name: "cornell_box_ball",
     };
 
     Scene {

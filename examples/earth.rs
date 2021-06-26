@@ -1,30 +1,33 @@
-use pathtracer::hitables::*;
+use pathtracer::hittables::*;
 use pathtracer::material::*;
 use pathtracer::primitive::*;
 use pathtracer::texture::*;
 use pathtracer::*;
 use rand::Rng;
 fn main() {
-    let mut hitable = HitableList::new();
+    let mut hittable = HittableList::new();
+    let mut materials = MaterialContainer::new();
+    let mut lights = HittableList::new();
 
-    hitable.add(Box::new(Sphere {
-        center: V3::new(0.0, 0.0, 0.0),
-        radius: 2.0,
-        material: Box::new(Lambertian {
-            albedo: Box::new(ImageTexture::new("assets/earthmap.png")),
-        }),
-    }));
+    hittable.add(Sphere::new(
+        V3::new(0.0, 0.0, 0.0),
+        2.0,
+        materials.add(Lambertian::new(Box::new(ImageTexture::new(
+            "assets/earthmap.png",
+        )))),
+    ));
     let mut seed = rand::thread_rng();
 
-    hitable.add(Box::new(Sphere {
-        center: V3::new(15.0, 0.0, 60.0),
-        radius: 20.0,
-        material: Box::new(LightSource {
-            albedo: Box::new(ConstantTexture {
-                color: V3::new(1.0, 1.0, 1.0).norm() * (15.0 + 15.0 * seed.gen::<f32>()),
-            }),
-        }),
-    }));
+    let light = Sphere::new(
+        V3::new(15.0, 0.0, 60.0),
+        20.0,
+        materials.add(LightSource::new(Box::new(ConstantTexture {
+            color: V3::new(1.0, 1.0, 1.0).norm() * (15.0 + 15.0 * seed.gen::<f32>()),
+        }))),
+    );
+
+    hittable.add(light.clone());
+    lights.add(light);
 
     let image_config = ImageConfig {
         nx: 2048,
@@ -49,7 +52,9 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable),
+        world: BvhNode::new(&hittable),
+        lights: Some(lights),
+        materials,
     }
     .loop_render(image_config, 12);
 }

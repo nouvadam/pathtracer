@@ -1,4 +1,4 @@
-use pathtracer::hitables::*;
+use pathtracer::hittables::*;
 use pathtracer::material::*;
 use pathtracer::primitive::*;
 use pathtracer::texture::*;
@@ -9,27 +9,24 @@ use pathtracer::*;
 // Stanford dragon
 
 fn main() {
-    let mut hitable = HitableList::new();
+    let mut hittable = HittableList::new();
+    let mut materials = MaterialContainer::new();
 
-    let _triangle_material = Box::new(Lambertian {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(0.4, 0.4, 0.9),
-        }),
-    });
+    let triangle_material = materials.add(Lambertian::new(Box::new(ConstantTexture {
+        color: V3::new(0.4, 0.4, 0.9),
+    })));
 
-    let gold_metal = Box::new(Metalic {
-        albedo: V3::new(0.831, 0.686, 0.215),
-        fuzz: 0.2,
-    });
+    let gold_metal = materials.add(Metalic::new(V3::new(0.831, 0.686, 0.215), 0.2));
 
-    hitable.add(Box::new(Sphere {
-        center: V3::new(0.0, -100.0, -10.0),
-        radius: 100.0,
-        material: _triangle_material,
-    }));
+    hittable.add(Sphere::new(
+        V3::new(0.0, -100.0, -10.0),
+        100.0,
+        triangle_material,
+    ));
 
-    hitable.add(
-        Box::new(Mesh::new("assets/dragon.obj", gold_metal).unwrap())
+    hittable.add(
+        Mesh::new("assets/dragon.obj", gold_metal)
+            .unwrap()
             //.rotate(V3::new(0.0, 1.0, 0.0), 0.8)
             .rotate(V3::new(0.0, 1.0, 0.0), 3.1415)
             .translate(V3::new(0.0, 0.0, 1.0)),
@@ -58,7 +55,9 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(BvhNode::new(hitable)),
+        world: BvhNode::new(&hittable),
+        lights: None,
+        materials,
     }
     .loop_render(image_config, 12);
 }

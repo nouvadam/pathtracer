@@ -25,7 +25,7 @@ impl ImageTexture {
         reader.next_frame(&mut texture).unwrap();
 
         ImageTexture {
-            texture: texture,
+            texture,
             bytes_per_pixel: 4,
             width: info.width,
             height: info.height,

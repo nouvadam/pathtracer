@@ -1,5 +1,6 @@
 use crate::hit::Hit;
 use crate::material::*;
+use crate::misc::UniformPdf;
 use crate::ray::Ray;
 use crate::texture::Texture;
 use crate::V3;
@@ -12,17 +13,27 @@ pub struct Isotropic {
     pub albedo: Box<dyn Texture + Sync + Send>,
 }
 
-impl Material for Isotropic {
-    fn scatter<'a>(&self, ray: &'a Ray, hit: &Hit) -> Option<(Ray<'a>, V3<f32>, bool)> {
-        let end = V3::get_point_on_sphere();
-        Some((
-            Ray {
-                origin: hit.point,
-                end,
-                ..*ray
-            },
-            self.albedo.value(hit.u, hit.v, hit.point),
-            false,
-        ))
+impl MaterialTrait for Isotropic {
+    fn scatter<'a>(&self, _ray_in: &'a Ray, hit: &Hit) -> Option<ScatterRecord<'a>> {
+        Some(ScatterRecord {
+            specular_ray: None,
+            attenuation: self.albedo.value(hit.u, hit.v, hit.point),
+            pdf: Box::new(UniformPdf),
+        })
+    }
+
+    fn scattering_pdf<'a>(&self, _ray_in: &'a Ray, _hit: &Hit, _ray_scattered: &Ray) -> f32 {
+        1.0 / (4.0 * std::f32::consts::PI)
+    }
+
+    fn color_emitted<'a>(&self, _ray_in: &'a Ray, _hit: &Hit) -> V3<f32> {
+        V3::zero()
+    }
+}
+
+impl Isotropic {
+    /// Returns new Dielectric material.
+    pub fn new(albedo: Box<dyn Texture + Sync + Send>) -> Material {
+        Material::Isotropic(Isotropic { albedo })
     }
 }

@@ -1,6 +1,6 @@
 use crate::hit::*;
-use crate::hitables::AABB;
-use crate::material::Material;
+use crate::hittables::Aabb;
+use crate::misc::Pdf;
 use crate::ray::*;
 use crate::V3;
 /// Primitive representing sphere that moves during some time interval.
@@ -13,7 +13,7 @@ pub struct MovingSphere {
     /// Radius of the sphere.
     pub radius: f32,
     /// Material of the sphere.
-    pub material: Box<dyn Material + Sync + Send>,
+    pub material: usize,
 }
 
 impl MovingSphere {
@@ -22,9 +22,24 @@ impl MovingSphere {
             + (self.centers.1 - self.centers.0)
                 * ((time - self.time_range.0) / (self.time_range.1 - self.time_range.0))
     }
+
+    /// Creates new MovingSphere primitive.
+    pub fn new(
+        centers: (V3<f32>, V3<f32>),
+        time_range: (f32, f32),
+        radius: f32,
+        material: usize,
+    ) -> Primitive {
+        Primitive::MovingSphere(Self {
+            centers,
+            time_range,
+            radius,
+            material,
+        })
+    }
 }
 
-impl Hitable for MovingSphere {
+impl Hittable for MovingSphere {
     fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         let oc = ray.origin - self.center(ray.time);
         let a = ray.end.dot(ray.end);
@@ -55,23 +70,33 @@ impl Hitable for MovingSphere {
             let u = 1.0 - (phi + std::f32::consts::PI) / (2.0 * std::f32::consts::PI);
             let v = (theta + std::f32::consts::PI / 2.0) / std::f32::consts::PI;
 
-            Some(Hit::new(ray, normal, time, point, &*self.material, u, v))
+            Some(Hit::new(ray, normal, time, point, self.material, u, v))
         } else {
             None
         }
     }
 
-    fn bounding_box(&self) -> AABB {
-        let t0_aabb = AABB {
+    fn bounding_box(&self) -> Aabb {
+        let t0_aabb = Aabb {
             min: self.center(self.time_range.0) - V3::new(self.radius, self.radius, self.radius),
             max: self.center(self.time_range.0) + V3::new(self.radius, self.radius, self.radius),
         };
 
-        let t1_aabb = AABB {
+        let t1_aabb = Aabb {
             min: self.center(self.time_range.1) - V3::new(self.radius, self.radius, self.radius),
             max: self.center(self.time_range.1) + V3::new(self.radius, self.radius, self.radius),
         };
 
         t0_aabb.surrounding_box(t1_aabb)
+    }
+}
+
+impl Pdf for MovingSphere {
+    fn value(&self, _origin: V3<f32>, _direction: V3<f32>) -> f32 {
+        todo!()
+    }
+
+    fn generate(&self, _origin: V3<f32>) -> V3<f32> {
+        todo!()
     }
 }

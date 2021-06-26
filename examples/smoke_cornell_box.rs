@@ -1,119 +1,61 @@
-use pathtracer::hitables::*;
+use pathtracer::hittables::*;
 use pathtracer::material::*;
 use pathtracer::primitive::*;
 use pathtracer::texture::*;
 use pathtracer::transform::*;
 use pathtracer::*;
 fn main() {
-    let mut hitable = HitableList::new();
+    let mut hittable = HittableList::new();
+    let mut lights = HittableList::new();
+    let mut materials = MaterialContainer::new();
 
-    let red = Lambertian {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(0.65, 0.05, 0.05),
-        }),
-    };
-    let white = Lambertian {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(1.00, 1.00, 1.00),
-        }),
-    };
-    let green = Lambertian {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(0.12, 0.45, 0.15),
-        }),
-    };
-    let light = LightSource {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(15.0, 15.0, 15.0),
-        }),
-    };
+    let red = materials.add(Lambertian::new(Box::new(ConstantTexture {
+        color: V3::new(0.65, 0.05, 0.05),
+    })));
+    let white = materials.add(Lambertian::new(Box::new(ConstantTexture {
+        color: V3::new(1.00, 1.00, 1.00),
+    })));
+    let green = materials.add(Lambertian::new(Box::new(ConstantTexture {
+        color: V3::new(0.12, 0.45, 0.15),
+    })));
+    let light = materials.add(LightSource::new(Box::new(ConstantTexture {
+        color: V3::new(15.0, 15.0, 15.0),
+    })));
 
-    hitable.add(Box::new(YZrect {
-        y0: 0.0,
-        y1: 555.0,
-        z0: 0.0,
-        z1: 555.0,
-        k: 555.0,
-        material: Box::new(green),
-    }));
+    hittable.add(YZrect::new(0.0, 555.0, 0.0, 555.0, 555.0, green));
 
-    hitable.add(Box::new(YZrect {
-        y0: 0.0,
-        y1: 555.0,
-        z0: 0.0,
-        z1: 555.0,
-        k: 0.0,
-        material: Box::new(red),
-    }));
+    hittable.add(YZrect::new(0.0, 555.0, 0.0, 555.0, 0.0, red));
 
-    hitable.add(Box::new(XZrect {
-        x0: 250.0,
-        x1: 380.0,
-        z0: 250.0,
-        z1: 380.0,
-        k: 554.0,
-        material: Box::new(light),
-    }));
+    hittable.add(XZrect::new(250.0, 380.0, 250.0, 380.0, 554.0, light).flip_face());
 
-    hitable.add(Box::new(XZrect {
-        x0: 0.0,
-        x1: 555.0,
-        z0: 0.0,
-        z1: 555.0,
-        k: 0.0,
-        material: Box::new(white.clone()),
-    }));
+    lights.add(XZrect::new(250.0, 380.0, 250.0, 380.0, 554.0, light).flip_face());
 
-    hitable.add(Box::new(XZrect {
-        x0: 0.0,
-        x1: 555.0,
-        z0: 0.0,
-        z1: 555.0,
-        k: 555.0,
-        material: Box::new(white.clone()),
-    }));
+    hittable.add(XZrect::new(0.0, 555.0, 0.0, 555.0, 0.0, white));
 
-    hitable.add(Box::new(XYrect {
-        x0: 0.0,
-        x1: 555.0,
-        y0: 0.0,
-        y1: 555.0,
-        k: 555.0,
-        material: Box::new(white.clone()),
-    }));
+    hittable.add(XZrect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
 
-    let isoblack = Isotropic {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(0.0, 0.0, 0.0),
-        }),
-    };
+    hittable.add(XYrect::new(0.0, 555.0, 0.0, 555.0, 555.0, white));
 
-    hitable.add(
-        Box::new(HitBox::new(
-            V3::new(0.0, 0.0, 0.0),
-            V3::new(165.0, 330.0, 165.0),
-            Box::new(white.clone()),
-        ))
-        .rotate(V3::new(0.0, 1.0, 0.0), 0.261_799_4)
-        .translate(V3::new(265.0, 0.0, 295.0))
-        .into_constant_medium(0.01, Box::new(isoblack)),
+    let isoblack = materials.add(Isotropic::new(Box::new(ConstantTexture {
+        color: V3::new(0.0, 0.0, 0.0),
+    })));
+
+    hittable.add(
+        HitBox::new(V3::new(0.0, 0.0, 0.0), V3::new(165.0, 330.0, 165.0), white)
+            .rotate(V3::new(0.0, 1.0, 0.0), 0.261_799_4)
+            .translate(V3::new(265.0, 0.0, 295.0))
+            .into_constant_medium(0.01, isoblack),
     );
 
-    let isowhite = Isotropic {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(1.0, 1.0, 1.0),
-        }),
-    };
+    let isowhite = materials.add(Isotropic::new(Box::new(ConstantTexture {
+        color: V3::new(1.0, 1.0, 1.0),
+    })));
 
-    hitable.add(
-        Box::new(HitBox::new(
-            V3::new(0.0, 0.0, 0.0),
-            V3::new(165.0, 165.0, 165.0),
-            Box::new(white),
-        ))
-        .rotate(V3::new(0.0, 1.0, 0.0), -0.314_159_27)
-        .translate(V3::new(130.0, 0.0, 65.0))
-        .into_constant_medium(0.01, Box::new(isowhite)),
+    hittable.add(
+        HitBox::new(V3::new(0.0, 0.0, 0.0), V3::new(165.0, 165.0, 165.0), white)
+            .rotate(V3::new(0.0, 1.0, 0.0), -0.314_159_27)
+            .translate(V3::new(130.0, 0.0, 65.0))
+            .into_constant_medium(0.01, isowhite),
     );
 
     let image_config = ImageConfig {
@@ -139,7 +81,9 @@ fn main() {
             0.0,                           //time0
             1.0,                           //time1
         ),
-        world: Box::new(hitable),
+        world: BvhNode::new(&hittable),
+        lights: Some(lights),
+        materials,
     }
     .loop_render(image_config, 12);
 }

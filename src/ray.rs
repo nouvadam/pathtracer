@@ -1,4 +1,7 @@
 use crate::hit::*;
+use crate::material::*;
+use crate::misc::{MixturePdf, Pdf};
+use crate::Scene;
 use crate::V3;
 
 /// Ray in form of segment of the straight line.
@@ -33,37 +36,72 @@ impl Ray<'_> {
 
     /// Get the color of casted Ray.
     ///
-    /// `hitable` - Struct implementing Hitable trait from which color should be taken; usually this is a Scene.
-    pub fn get_color(&self, hitable: &dyn Hitable) -> V3<f32> {
-        self.color(hitable, 0)
+    /// `hittable` - Struct implementing hittable trait from which color should be taken; usually this is a Scene.
+    pub fn get_color(&self, scene: &Scene) -> V3<f32> {
+        self.color(scene, 0)
     }
 
     /// Recursively bounce ray between objects in scene, at each hit multiply current color of the ray with color of the object, or hit point on the object.
-    fn color(&self, hitable: &dyn Hitable, depth: u16) -> V3<f32> {
+    fn color(&self, scene: &Scene, depth: u16) -> V3<f32> {
         // Does the intersection occur at all?
-        match hitable.hit(self, 0.001, 2048.0) {
+        match scene.world.hit(self, 0.001, 2048.0) {
             // If ray hit some object, then we bounce that Ray from the object with updated color.
-            Some(hit) => match hit.material.scatter(&self, &hit) {
-                // Scatter ray from a hit point
+            Some(hit) => {
+                let material = scene.materials.get(hit.material);
+                match material.scatter(&self, &hit) {
+                    // Scatter ray from a hit point
 
-                // Ray has been scattered
-                Some((ray, albedo, light)) => {
-                    // Checks if ray had bounced too many times.
-                    if depth < self.setting.depth {
-                        // Checks if the material that Ray has hit emits light, if yes, then returns the color of this light without bouncing ray futher.
-                        if light {
-                            albedo
+                    // Ray has been scattered
+                    Some(scatter_record) => {
+                        // Checks if ray had bounced too many times.
+                        if depth < self.setting.depth {
+                            let generated_dir;
+                            let pdf_val: f32;
+
+                            // If there are lights on the scene, then sample rays to those lights and with accordance to material, else sample just from the material.
+                            match &scene.lights {
+                                Some(lights) => {
+                                    let mixture_pdf = MixturePdf::new(lights, &*scatter_record.pdf);
+                                    generated_dir = mixture_pdf.generate(hit.point);
+                                    pdf_val = mixture_pdf.value(hit.point, generated_dir);
+                                }
+                                None => {
+                                    generated_dir = scatter_record.pdf.generate(hit.point);
+                                    pdf_val = scatter_record.pdf.value(hit.point, generated_dir);
+                                }
+                            }
+
+                            let scattered_ray = Ray {
+                                origin: hit.point,
+                                end: generated_dir,
+                                time: self.time,
+                                setting: self.setting,
+                            };
+
+                            
+                            match scatter_record.specular_ray {
+                                Some(ray) => {
+                                    // Returns specular ray.
+                                    scatter_record.attenuation.mul(ray.color(scene, depth + 1))
+                                }
+                                None => {
+                                    // Returns scattered ray.
+                                    material.color_emitted(&self, &hit)
+                                        + ((scatter_record.attenuation
+                                            * material.scattering_pdf(&self, &hit, &scattered_ray))
+                                        .mul(scattered_ray.color(scene, depth + 1))
+                                            / pdf_val)
+                                }
+                            }
                         } else {
-                            //
-                            albedo.mul(ray.color(hitable, depth + 1))
+                            // If the ray bounce limit is exceeded, no more light is gathered.
+                            V3::new(0.0, 0.0, 0.0)
                         }
-                    } else {
-                        V3::new(0.0, 0.0, 0.0)
                     }
+                    // If scatter hasn't produced Ray, at example in case of absorbing the Ray, then the resulting color of the Ray is emitted light by the object.
+                    None => material.color_emitted(&self, &hit),
                 }
-                // If scatter hasn't produced Ray, at example in case of absorbing the Ray, then the resulting color of the Ray is black.
-                None => V3::new(0.0, 0.0, 0.0),
-            },
+            }
             // No intersections occured, thus Ray came from the background.
             None => self.setting.background_color,
         }

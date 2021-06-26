@@ -1,60 +1,50 @@
-use pathtracer::hitables::*;
+use pathtracer::hittables::*;
 use pathtracer::material::*;
 use pathtracer::primitive::*;
 use pathtracer::texture::*;
 use pathtracer::*;
 
 fn main() {
-    let mut hitable = HitableList::new();
+    let mut hittable = HittableList::new();
+    let mut materials = MaterialContainer::new();
 
     //ground
-    hitable.add(Box::new(Sphere {
-        center: V3::new(0.0, -100.5, -1.0),
-        radius: 100.0,
-        material: Box::new(Lambertian {
-            albedo: Box::new(ConstantTexture {
-                color: V3::new(0.8, 0.8, 0.0),
-            }),
-        }),
-    }));
+    hittable.add(Sphere::new(
+        V3::new(0.0, -100.5, -1.0),
+        100.0,
+        materials.add(Lambertian::new(Box::new(ConstantTexture {
+            color: V3::new(0.8, 0.8, 0.0),
+        }))),
+    ));
 
     //center
-    hitable.add(Box::new(Sphere {
-        center: V3::new(0.0, 0.0, -1.0),
-        radius: 0.5,
-        material: Box::new(Lambertian {
-            albedo: Box::new(ConstantTexture {
-                color: V3::new(0.1, 0.2, 0.5),
-            }),
-        }),
-    }));
+    hittable.add(Sphere::new(
+        V3::new(0.0, 0.0, -1.0),
+        0.5,
+        materials.add(Lambertian::new(Box::new(ConstantTexture {
+            color: V3::new(0.1, 0.2, 0.5),
+        }))),
+    ));
 
     //left
-    hitable.add(Box::new(Sphere {
-        center: V3::new(-1.0, 0.0, -1.0),
-        radius: 0.5,
-        material: Box::new(Dielectric {
-            refractive_index: 1.5,
-        }),
-    }));
+    hittable.add(Sphere::new(
+        V3::new(-1.0, 0.0, -1.0),
+        0.5,
+        materials.add(Dielectric::new(1.5)),
+    ));
 
-    hitable.add(Box::new(Sphere {
-        center: V3::new(-1.0, 0.0, -1.0),
-        radius: -0.45,
-        material: Box::new(Dielectric {
-            refractive_index: 1.5,
-        }),
-    }));
+    hittable.add(Sphere::new(
+        V3::new(-1.0, 0.0, -1.0),
+        -0.45,
+        materials.add(Dielectric::new(1.5)),
+    ));
 
     //right
-    hitable.add(Box::new(Sphere {
-        center: V3::new(1.0, 0.0, -1.0),
-        radius: 0.5,
-        material: Box::new(Metalic {
-            albedo: V3::new(0.8, 0.6, 0.2),
-            fuzz: 0.0,
-        }),
-    }));
+    hittable.add(Sphere::new(
+        V3::new(1.0, 0.0, -1.0),
+        0.5,
+        materials.add(Metalic::new(V3::new(0.8, 0.6, 0.2), 0.0)),
+    ));
 
     let image_config = ImageConfig {
         nx: 2048,
@@ -79,7 +69,9 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable),
+        world: BvhNode::new(&hittable),
+        lights: None,
+        materials,
     }
     .loop_render(image_config, 12);
 }

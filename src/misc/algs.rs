@@ -6,7 +6,7 @@ pub fn quickselect<T>(v: &mut [T], k: usize) -> T
 where
     T: Ord + Copy,
 {
-    bquickselect(v, 0, v.len()-1, k)
+    bquickselect(v, 0, v.len() - 1, k)
 }
 
 fn bquickselect<T>(array: &mut [T], left_bound: usize, right_bound: usize, pos: usize) -> T
@@ -19,12 +19,11 @@ where
 
     let middle = partition(array, left_bound, right_bound);
 
-    if pos == middle {
-        return array[pos];
-    } else if pos < middle {
-        return bquickselect(array, left_bound, middle - 1, pos);
-    } else {
-        return bquickselect(array, middle + 1, right_bound, pos);
+    use std::cmp::Ordering;
+    match pos.cmp(&middle) {
+        Ordering::Greater => bquickselect(array, middle + 1, right_bound, pos),
+        Ordering::Less => bquickselect(array, left_bound, middle - 1, pos),
+        Ordering::Equal => array[pos],
     }
 }
 

@@ -59,17 +59,14 @@ use std::iter::FromIterator;
 impl<T: Float> FromIterator<T> for V3<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         let mut v3 = V3::zero();
-        let mut index = 0;
 
-        for i in iter {
+        for (index, i) in iter.into_iter().enumerate() {
             match index {
                 0 => v3.x = i,
                 1 => v3.y = i,
                 2 => v3.z = i,
                 _ => {}
             }
-
-            index = index + 1;
         }
 
         v3
@@ -205,13 +202,13 @@ impl<
             z: T::zero(),
         }
     }
-    /// Returns lenght of the vector.
-    pub fn len(self) -> T {
+    /// Returns length of the vector.
+    pub fn length(self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
-    /// Returns normalized vector, which lenght equals 1.
+    /// Returns normalized vector, which length equals 1.
     pub fn norm(self) -> V3<T> {
-        self / V3::len(self)
+        self / V3::length(self)
     }
 
     /// Returns vector rotated around Y axis by some angle.
@@ -256,11 +253,11 @@ impl V3<f32> {
         V3::new(self.x.floor(), self.y.floor(), self.z.floor())
     }
 
-    /// Returns random vector, whose lenght is smaller than 1.
+    /// Returns random vector, whose lengthgthght is smaller than 1.
     pub fn get_point_in_sphere() -> V3<f32> {
         let mut rng = rand::thread_rng();
         let mut random_point = V3::new(1.0, 1.0, 1.0);
-        while random_point.len() > 1.0 {
+        while random_point.length() > 1.0 {
             random_point = V3::new(
                 (rng.gen::<f32>() * 2.0) - 1.0,
                 (rng.gen::<f32>() * 2.0) - 1.0,
@@ -286,6 +283,33 @@ impl V3<f32> {
         .norm()
     }
 
+    /// Random cosine direction, with pdf proportional to cos(theta)/pi, used in lambertian scattering
+    pub fn random_cosine_direction() -> V3<f32> {
+        let mut rng = rand::thread_rng();
+
+        let r1 = rng.gen::<f32>();
+        let r2 = rng.gen::<f32>();
+
+        let z = (1.0 - r2).sqrt();
+
+        let phi = 2.0 * std::f32::consts::PI * r1;
+
+        let sqr = r2.sqrt();
+
+        let x = phi.cos() * sqr;
+        let y = phi.sin() * sqr;
+
+        V3::new(x, y, z)
+    }
+
+    /**
+    Checks if vector's length is near zero.
+    */
+    pub fn near_zero(&self) -> bool {
+        const EPSILON: f32 = 1e-8;
+        (self.x.abs() < EPSILON) && (self.y.abs() < EPSILON) && (self.z.abs()) < EPSILON
+    }
+
     /// function to rotate v3<T> point around axis, sin and cos arguments are precomputed, and they represent angle/2 because of algorithm
     pub fn rot(self, axis: V3<f32>, sin: f32, cos: f32) -> V3<f32> {
         //point to rotate
@@ -295,10 +319,10 @@ impl V3<f32> {
             z: zp,
         } = self;
 
-        //real component of quaternion
+        // real component of quaternion
         let s = cos;
-        //imaginary component of quaternion
-        let V3 { x, y, z } = axis * (sin / axis.len());
+        // imaginary component of quaternion
+        let V3 { x, y, z } = axis * (sin / axis.length());
         let s2 = s.powi(2);
 
         V3::new(

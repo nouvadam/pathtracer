@@ -2,8 +2,8 @@
 
 mod aabb;
 mod bvh;
-mod hitable_list;
+mod hittable_list;
 
 pub use aabb::*;
 pub use bvh::*;
-pub use hitable_list::*;
+pub use hittable_list::*;

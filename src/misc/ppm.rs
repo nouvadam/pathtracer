@@ -3,9 +3,9 @@ use crate::V3;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-/// PPM file format.
+/// Ppm file format.
 #[derive(Clone, Debug, PartialEq)]
-pub struct PPM {
+pub struct Ppm {
     /// Height of the image.
     pub height: u32,
     /// Width of the image.
@@ -13,34 +13,34 @@ pub struct PPM {
     data: Vec<u8>,
 }
 
-impl PPM {
-    /// Returns new PPM object.
-    pub fn new(height: u32, width: u32) -> PPM {
+impl Ppm {
+    /// Returns new Ppm object.
+    pub fn new(height: u32, width: u32) -> Ppm {
         let size = 3 * height * width;
         let data = vec![0; size as usize];
-        PPM {
+        Ppm {
             height,
             width,
             data,
         }
     }
-	
-	/// Returns new PPM object created from `rgb` vector.
-	pub fn new_from_vec(height: u32, width: u32, rgb: Vec<u8>) -> Result<PPM, &'static str> {
-		let size = 3*height*width;
-		
-		use std::convert::TryInto;
-		if size != rgb.len().try_into().unwrap() {
-			return Err("Invalid rgb vector size.");
-		} else {
-			Ok(PPM {
-				height,
-				width,
-				data: rgb
-			})
-		}
-	}
-	
+
+    /// Returns new Ppm object created from `rgb` vector.
+    pub fn new_from_vec(height: u32, width: u32, rgb: Vec<u8>) -> Result<Ppm, &'static str> {
+        let size = 3 * height * width;
+
+        use std::convert::TryInto;
+        if size != rgb.len().try_into().unwrap() {
+            Err("Invalid rgb vector size.")
+        } else {
+            Ok(Ppm {
+                height,
+                width,
+                data: rgb,
+            })
+        }
+    }
+
     fn buffer_size(&self) -> u32 {
         3 * self.height * self.width
     }
@@ -95,7 +95,7 @@ impl PPM {
             })
     }
 
-    /// Write PPM into file with given `filename`.
+    /// Write Ppm into file with given `filename`.
     pub fn write_file(&self, filename: &str) -> std::io::Result<()> {
         let path = Path::new(filename);
         let mut file = File::create(&path)?;

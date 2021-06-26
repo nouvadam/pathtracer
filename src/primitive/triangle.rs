@@ -1,6 +1,6 @@
 use crate::hit::*;
-use crate::hitables::AABB;
-use crate::material::Material;
+use crate::hittables::Aabb;
+use crate::misc::Pdf;
 use crate::ray::*;
 use crate::V3;
 /// Triangle primitive.
@@ -11,11 +11,11 @@ pub struct Triangle {
     /// Normals of corresponding verticles
     normals: Option<[V3<f32>; 3]>,
     /// Material of verticle
-    material: Box<dyn Material + Sync + Send>,
-    bounding_box: AABB,
+    material: usize,
+    bounding_box: Aabb,
 }
 
-impl Hitable for Triangle {
+impl Hittable for Triangle {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         let v0v1 = self.verticles[1] - self.verticles[0];
         let v0v2 = self.verticles[2] - self.verticles[0];
@@ -32,7 +32,7 @@ impl Hitable for Triangle {
         let tvec = r.origin - self.verticles[0];
         let u = tvec.dot(pvec) * inv_det;
 
-        if u < 0.0 || u > 1.0 {
+        if !(0.0..=1.0).contains(&u) {
             return None;
         }
 
@@ -59,18 +59,18 @@ impl Hitable for Triangle {
             normal_to_triangle,
             t,
             r.point_at_param(t),
-            &*self.material,
+            self.material,
             u,
             v,
         ))
     }
 
-    fn bounding_box(&self) -> AABB {
+    fn bounding_box(&self) -> Aabb {
         self.bounding_box.clone()
     }
 }
 
-impl<'material> Triangle {
+impl Triangle {
     /// Returns new Triangle
     ///
     /// `verticles` - Verticles of created Triangle, CCW
@@ -78,23 +78,16 @@ impl<'material> Triangle {
     /// `normals` - Normals of corresponding verticles.
     ///
     /// `material` - Material of created Triangle.
-    pub fn new(
-        verticles: V3<V3<f32>>,
-        normals: Option<V3<V3<f32>>>,
-        material: Box<dyn Material + Sync + Send>,
-    ) -> Triangle {
-        Triangle {
+    pub fn new(verticles: V3<V3<f32>>, normals: Option<V3<V3<f32>>>, material: usize) -> Primitive {
+        Primitive::Triangle(Triangle {
             verticles: [verticles.x, verticles.y, verticles.z],
-            normals: match normals {
-                Some(normals) => Some([normals.x, normals.y, normals.z]),
-                None => None,
-            },
+            normals: normals.map(|normals| [normals.x, normals.y, normals.z]),
             material,
             bounding_box: Self::init_bounding_box(&verticles),
-        }
+        })
     }
 
-    fn init_bounding_box(verticles: &V3<V3<f32>>) -> AABB {
+    fn init_bounding_box(verticles: &V3<V3<f32>>) -> Aabb {
         use crate::misc::IntoMultizip;
 
         let rotated_and_zipped_points = verticles
@@ -119,6 +112,16 @@ impl<'material> Triangle {
             })
             .collect::<V3<f32>>();
 
-        AABB { min, max }
+        Aabb { min, max }
+    }
+}
+
+impl Pdf for Triangle {
+    fn value(&self, _origin: V3<f32>, _direction: V3<f32>) -> f32 {
+        todo!()
+    }
+
+    fn generate(&self, _origin: V3<f32>) -> V3<f32> {
+        todo!()
     }
 }

@@ -1,4 +1,4 @@
-use pathtracer::hitables::*;
+use pathtracer::hittables::*;
 use pathtracer::material::*;
 use pathtracer::primitive::*;
 use pathtracer::texture::*;
@@ -8,95 +8,107 @@ use pathtracer::*;
 // https://www.cgtrader.com/free-3d-print-models/art/sculptures/pegasus-statue-sculpture-statuette-figurine-horse
 
 fn main() {
-    let mut hitable = HitableList::new();
+    let mut hittable = HittableList::new();
+    let mut lights = HittableList::new();
+    let mut materials = MaterialContainer::new();
 
-    let _triangle_material = Box::new(Lambertian {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(1.0, 0.3, 0.3),
-        }),
-    });
+    let _triangle_material = materials.add(Lambertian::new(Box::new(ConstantTexture {
+        color: V3::new(1.0, 0.3, 0.3),
+    })));
 
-    let _glass_material = Box::new(Dielectric {
-        refractive_index: 1.5,
-    });
+    let glass_material = materials.add(Dielectric::new(1.5));
 
-    let red = Lambertian {
+    let red = materials.add(Material::Lambertian(Lambertian {
         albedo: Box::new(ConstantTexture {
             color: V3::new(0.65, 0.05, 0.05),
         }),
-    };
-    let white = Lambertian {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(0.73, 0.73, 0.73),
-        }),
-    };
-    let green = Lambertian {
+    }));
+    let white = materials.add(Lambertian::new(Box::new(ConstantTexture {
+        color: V3::new(0.73, 0.73, 0.73),
+    })));
+    let green = materials.add(Material::Lambertian(Lambertian {
         albedo: Box::new(ConstantTexture {
             color: V3::new(0.12, 0.45, 0.15),
         }),
-    };
-    let light = LightSource {
+    }));
+    let light = materials.add(Material::LightSource(LightSource {
         albedo: Box::new(ConstantTexture {
             color: V3::new(15.0, 15.0, 15.0),
         }),
-    };
+    }));
 
-    hitable.add(Box::new(YZrect {
+    hittable.add(Primitive::YZrect(YZrect {
         y0: 0.0,
         y1: 1.7,
         z0: 0.0,
         z1: 1.7,
         k: 1.7,
-        material: Box::new(green),
+        material: green,
     }));
 
-    hitable.add(Box::new(YZrect {
+    hittable.add(Primitive::YZrect(YZrect {
         y0: 0.0,
         y1: 1.7,
         z0: 0.0,
         z1: 1.7,
         k: 0.0,
-        material: Box::new(red),
+        material: red,
     }));
 
-    hitable.add(Box::new(XZrect {
-        x0: 0.595,
-        x1: 1.105,
-        z0: 0.595,
-        z1: 1.105,
-        k: 1.69,
-        material: Box::new(light),
-    }));
+    hittable.add(
+        Primitive::XZrect(XZrect {
+            x0: 0.595,
+            x1: 1.105,
+            z0: 0.595,
+            z1: 1.105,
+            k: 1.69,
+            material: light,
+        })
+        .flip_face(),
+    );
 
-    hitable.add(Box::new(XZrect {
+    lights.add(
+        Primitive::XZrect(XZrect {
+            x0: 0.595,
+            x1: 1.105,
+            z0: 0.595,
+            z1: 1.105,
+            k: 1.69,
+            material: light,
+        })
+        .flip_face(),
+    );
+
+    hittable.add(Primitive::XZrect(XZrect {
         x0: 0.0,
         x1: 1.7,
         z0: 0.0,
         z1: 1.7,
         k: 0.0,
-        material: Box::new(white.clone()),
+        material: white,
     }));
 
-    hitable.add(Box::new(XZrect {
+    hittable.add(Primitive::XZrect(XZrect {
         x0: 0.0,
         x1: 1.7,
         z0: 0.0,
         z1: 1.7,
         k: 1.7,
-        material: Box::new(white.clone()),
+        material: white,
     }));
 
-    hitable.add(Box::new(XYrect {
+    hittable.add(Primitive::XYrect(XYrect {
         x0: 0.0,
         x1: 1.7,
         y0: 0.0,
         y1: 1.7,
         k: 1.7,
-        material: Box::new(white.clone()),
+        material: white,
     }));
 
-    hitable.add(
-        Box::new(Mesh::new("assets/pegasus.obj", _glass_material).unwrap())
+    hittable.add(
+        Mesh::new("assets/pegasus.obj", glass_material)
+            .unwrap()
             //.rotate(V3::new(0.0, 1.0, 0.0), 0.8)
             .rotate(V3::new(0.0, 1.0, 0.0), 3.1415)
             .translate(V3::new(0.85, 0.0, 0.85)),
@@ -125,7 +137,9 @@ fn main() {
             0.0,                       //time0
             1.0,                       //time1
         ),
-        world: Box::new(BvhNode::new(hitable)),
+        world: BvhNode::new(&hittable),
+        lights: Some(lights),
+        materials,
     }
     .loop_render(image_config, 12);
 }

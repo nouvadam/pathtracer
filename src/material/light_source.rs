@@ -10,18 +10,34 @@ pub struct LightSource {
     pub albedo: Box<dyn Texture + Sync + Send>,
 }
 
-impl Material for LightSource {
+impl MaterialTrait for LightSource {
     #[warn(unused_variables)]
-    fn scatter<'a>(&self, ray: &'a Ray, hit: &Hit) -> Option<(Ray<'a>, V3<f32>, bool)> {
-        let target = hit.point + hit.normal; // + V3::get_point_on_sphere();
-        Some((
-            Ray {
-                origin: hit.point,
-                end: target - hit.point,
-                ..*ray
-            },
-            self.albedo.value(hit.u, hit.v, hit.point),
-            true,
-        ))
+    fn scatter<'a>(&self, _ray_in: &'a Ray, _hit: &Hit) -> Option<ScatterRecord<'a>> {
+        None
+    }
+
+    fn scattering_pdf<'a>(&self, _ray_in: &'a Ray, hit: &Hit, ray_scattered: &Ray) -> f32 {
+        let cosine = ray_scattered.end.norm().dot(hit.normal);
+
+        if cosine < 0.0 {
+            0.0
+        } else {
+            cosine / std::f32::consts::PI
+        }
+    }
+
+    fn color_emitted<'a>(&self, _ray_in: &'a Ray, hit: &Hit) -> V3<f32> {
+        if hit.front_face {
+            self.albedo.value(hit.u, hit.v, hit.point)
+        } else {
+            V3::zero()
+        }
+    }
+}
+
+impl LightSource {
+    /// Returns new Dielectric material.
+    pub fn new(albedo: Box<dyn Texture + Sync + Send>) -> Material {
+        Material::LightSource(LightSource { albedo })
     }
 }

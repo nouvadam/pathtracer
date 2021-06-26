@@ -1,5 +1,5 @@
 /*use raytracer::camera::Camera;
-use raytracer::hitable_list::HitableList;
+use raytracer::hittable_list::hittableList;
 use raytracer::image_config::ImageConfig;
 use raytracer::scene::Scene;
 use raytracer::vec3::V3;
@@ -11,7 +11,7 @@ use raytracer::texture::constant_texture::ConstantTexture;
 use pathtracer::transform::translate::*;*/
 
 //use pathtracer::Camera;
-use pathtracer::hitables::*;
+use pathtracer::hittables::*;
 use pathtracer::material::*;
 use pathtracer::primitive::*;
 use pathtracer::texture::*;
@@ -19,21 +19,18 @@ use pathtracer::transform::*;
 use pathtracer::*;
 
 fn main() {
-    let mut hitable = HitableList::new();
+    let mut hittable = HittableList::new();
+    let mut materials = MaterialContainer::new();
 
-    let triangle_material_1 = Box::new(Lambertian {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(0.5, 1.0, 0.5),
-        }),
-    });
+    let triangle_material_1 = materials.add(Lambertian::new(Box::new(ConstantTexture {
+        color: V3::new(0.5, 1.0, 0.5),
+    })));
 
-    let triangle_material_2 = Box::new(Lambertian {
-        albedo: Box::new(ConstantTexture {
-            color: V3::new(1.0, 0.5, 0.5),
-        }),
-    });
+    let triangle_material_2 = materials.add(Lambertian::new(Box::new(ConstantTexture {
+        color: V3::new(1.0, 0.5, 0.5),
+    })));
 
-    hitable.add(Box::new(Triangle::new(
+    hittable.add(Triangle::new(
         V3::new(
             V3::new(0.0, 0.5, -2.0),
             V3::new(-0.25, 0.0, -2.0),
@@ -41,10 +38,10 @@ fn main() {
         ),
         None,
         triangle_material_1,
-    )));
+    ));
 
-    hitable.add(
-        Box::new(Triangle::new(
+    hittable.add(
+        Triangle::new(
             V3::new(
                 V3::new(0.0, 0.5, -2.0),
                 V3::new(-0.25, 0.0, -2.0),
@@ -52,7 +49,7 @@ fn main() {
             ),
             None,
             triangle_material_2,
-        ))
+        )
         .translate(V3::new(0.1, 0.1, 0.1)),
     );
 
@@ -79,7 +76,9 @@ fn main() {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: Box::new(hitable),
+        world: BvhNode::new(&hittable),
+        lights: None,
+        materials,
     }
     .loop_render(image_config, 12);
 }

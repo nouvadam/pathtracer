@@ -4,14 +4,14 @@ use itertools::*;
 
 /// Bounding box, to use with Octtree
 #[derive(Clone)]
-pub struct AABB {
+pub struct Aabb {
     /// Represents cube's vertex that is lower-back-left  (on the negative side of coordinate system).
     pub min: V3<f32>,
     /// Represents cube's vertex that is upper-front-right  (on the positive side of coordinate system).
     pub max: V3<f32>,
 }
 
-impl AABB {
+impl Aabb {
     /// Checks if Ray intersects with this bounding box.
     pub fn hit(&self, ray: &Ray) -> bool {
         let inv_end = V3::new(1.0, 1.0, 1.0).div(ray.end);
@@ -46,8 +46,8 @@ impl AABB {
     }
 
     /// Creates new bounding box that surrounds two bounding boxes.
-    pub fn surrounding_box(&self, second: AABB) -> AABB {
-        AABB {
+    pub fn surrounding_box(&self, second: Aabb) -> Aabb {
+        Aabb {
             min: V3::new(
                 self.min.x.min(second.min.x),
                 self.min.y.min(second.min.y),

@@ -14,7 +14,7 @@ mod ray;
 mod render;
 mod vec3;
 
-pub mod hitables;
+pub mod hittables;
 pub mod material;
 pub mod misc;
 pub mod primitive;

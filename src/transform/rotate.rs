@@ -1,7 +1,9 @@
-use crate::hitables::AABB;
-use crate::{Hit, Hitable, Ray, V3};
+use crate::hit::Primitive;
+use crate::hittables::Aabb;
+use crate::misc::Pdf;
+use crate::{Hit, Hittable, Ray, V3};
 
-/// Represents a Hitable object that was rotated by some angle around some axis.
+/// Represents a hittable object that was rotated by some angle around some axis.
 #[derive(Clone)]
 pub struct Rotated {
     /// Sinus of the angle.
@@ -11,22 +13,22 @@ pub struct Rotated {
     /// Axis around which should the object be rotated.
     axis: V3<f32>,
     /// Bounding box of the rotated object.
-    bounding_box: AABB,
+    bounding_box: Aabb,
     /// Object that is rotated.
-    hitable: Box<dyn Hitable>,
+    hittable: Box<Primitive>,
 }
 
-impl Hitable for Rotated {
+impl Hittable for Rotated {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         let origin = r.origin.rot(-self.axis, self.sin_theta, self.cos_theta);
         let end = r.end.rot(-self.axis, self.sin_theta, self.cos_theta);
 
         let rotated_ray = Ray { origin, end, ..*r };
 
-        let hit = self.hitable.hit(&rotated_ray, t_min, t_max);
+        let hit = self.hittable.hit(&rotated_ray, t_min, t_max);
 
-        match hit {
-            Some(hit) => Some(Hit::new(
+        hit.map(|hit| {
+            Hit::new(
                 &rotated_ray,
                 hit.normal.rot(self.axis, self.sin_theta, self.cos_theta),
                 hit.t,
@@ -34,24 +36,23 @@ impl Hitable for Rotated {
                 hit.material,
                 hit.u,
                 hit.v,
-            )),
-            None => None,
-        }
+            )
+        })
     }
 
-    fn bounding_box(&self) -> AABB {
+    fn bounding_box(&self) -> Aabb {
         self.bounding_box.clone()
     }
 }
 /// Transforms object into Rotated object
 pub trait IntoRotated {
     /// Transforms object into Rotated object
-    fn rotate(self, axis: V3<f32>, angle: f32) -> Box<Rotated>;
+    fn rotate(self, axis: V3<f32>, angle: f32) -> Primitive; //Box<Rotated<'mat>>;
 }
 
-// All Hitable objects now implements 'rotate' method, that takes ownership of underlying Hitable object, creates new Rotated object that surrounds Hitable with rotation info, and returns that new object
-impl<T: 'static + Hitable> IntoRotated for Box<T> {
-    fn rotate(self, axis: V3<f32>, angle: f32) -> Box<Rotated> {
+// All hittable objects now implements 'rotate' method, that takes ownership of underlying hittable object, creates new Rotated object that surrounds hittable with rotation info, and returns that new object
+impl IntoRotated for Primitive {
+    fn rotate(self, axis: V3<f32>, angle: f32) -> Primitive {
         let angle = angle / 2.0;
 
         // Needed for quaterion rotation
@@ -62,7 +63,7 @@ impl<T: 'static + Hitable> IntoRotated for Box<T> {
 
         // Creating new bounding box, aligned with the coordinate system, from rotated bounding box
 
-        // Rotate verticles of Bounding Box of underlying Hitable object, and multizip verticles' axis to 3 vectors
+        // Rotate verticles of Bounding Box of underlying hittable object, and multizip verticles' axis to 3 vectors
         let rotated_and_zipped_points = self
             .bounding_box()
             .get_box_points()
@@ -93,12 +94,22 @@ impl<T: 'static + Hitable> IntoRotated for Box<T> {
             })
             .collect::<V3<f32>>();
 
-        Box::new(Rotated {
+        Primitive::Rotated(Rotated {
             sin_theta,
             cos_theta,
             axis,
-            bounding_box: AABB { min, max },
-            hitable: self,
+            bounding_box: Aabb { min, max },
+            hittable: Box::new(self),
         })
+    }
+}
+
+impl Pdf for Rotated {
+    fn value(&self, _origin: V3<f32>, _direction: V3<f32>) -> f32 {
+        todo!()
+    }
+
+    fn generate(&self, _origin: V3<f32>) -> V3<f32> {
+        todo!()
     }
 }

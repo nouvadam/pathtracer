@@ -15,3 +15,5 @@ pub use rectangle::XZrect;
 pub use rectangle::YZrect;
 pub use sphere::Sphere;
 pub use triangle::Triangle;
+
+use crate::hit::*;
