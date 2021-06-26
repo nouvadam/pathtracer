@@ -5,6 +5,8 @@ Simple toy path tracer, inspired by [Ray Tracing in One Weekend](https://raytrac
 ![mesh_test_2048](https://user-images.githubusercontent.com/66559370/104132481-d38a3680-537d-11eb-8baa-6e11b2caa444.jpg)
 ![balls](https://user-images.githubusercontent.com/66559370/104132504-f61c4f80-537d-11eb-9577-020fb06e181d.jpg)
 ![final_scene_2048](https://user-images.githubusercontent.com/66559370/104132491-e270e900-537d-11eb-8344-a129cb362f14.jpg)
+![random_scene_2_256_median_1](https://user-images.githubusercontent.com/66559370/123523318-243ee300-d6c3-11eb-85af-a2f3e150ea0a.jpg)
+
 
 ## Key Features
 * Basic support for .obj files
