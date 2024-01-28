@@ -73,24 +73,6 @@ impl<T: Float> FromIterator<T> for V3<T> {
     }
 }
 
-/*impl<TypeOfNumber: Copy> TryFrom<Vec<TypeOfNumber>> for V3<TypeOfNumber> {
-    type Error = &'static str;
-
-    fn try_from(vector: Vec<TypeOfNumber>) -> Result<Self, Self::Error> {
-        if vector.len() < 3 {
-            Err("Vector is smaller than 3, thus it is not possible to create 3D vector")
-        } else {
-            Ok(V3{x: vector[0], y: vector[1], z: vector[2]})
-        }
-    }
-}
-
-impl<TypeOfNumber: Copy> From<V3<TypeOfNumber>> for Vec<TypeOfNumber> {
-    fn from(v3: V3<TypeOfNumber>) -> Self {
-        vec![v3.x, v3.y, v3.z]
-    }
-}*/
-
 impl<T> V3<T> {
     /// Returns new Vector
     #[inline]
@@ -98,25 +80,6 @@ impl<T> V3<T> {
         V3 { x, y, z }
     }
 }
-
-/*impl<T: Add> Add for V3<T> {
-    type Output = Self;
-
-    fn add(self, other: Self) -> Self {
-        Self {
-            x: self.x + other.x,
-            y: self.y + other.y,
-            z: self.z + other.z,
-        }
-    }
-}*/
-
-/*use std::iter::Sum;
-impl<T: Add+Default> Sum for V3<T> {
-    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
-            iter.fold(Default::default(), |a, b| V3::new(a.x+b.x, a.y+b.y, a.z+b.z))
-        }
-}*/
 
 impl<T: Add<U, Output = V>, U, V> Add<V3<U>> for V3<T> {
     type Output = V3<V>;
@@ -253,7 +216,7 @@ impl V3<f32> {
         V3::new(self.x.floor(), self.y.floor(), self.z.floor())
     }
 
-    /// Returns random vector, whose lengthgthght is smaller than 1.
+    /// Returns random vector, whose lenght is smaller than 1.
     pub fn get_point_in_sphere() -> V3<f32> {
         let mut rng = rand::thread_rng();
         let mut random_point = V3::new(1.0, 1.0, 1.0);
