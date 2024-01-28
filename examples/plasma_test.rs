@@ -81,7 +81,7 @@ fn main() {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 32,
         },
-        name: r#"plasma_test"#,
+        name: "plasma_test",
     };
 
     Scene {

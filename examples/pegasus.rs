@@ -122,7 +122,7 @@ fn main() {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 16,
         },
-        name: r#"pegasus"#,
+        name: "pegasus",
     };
 
     Scene {

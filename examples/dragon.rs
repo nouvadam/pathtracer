@@ -40,7 +40,7 @@ fn main() {
             background_color: V3::new(0.5, 0.7, 1.0),
             depth: 16,
         },
-        name: r#"dragon"#,
+        name: "dragon",
     };
 
     Scene {

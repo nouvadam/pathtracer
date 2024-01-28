@@ -63,7 +63,7 @@ fn main() {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 32,
         },
-        name: r#"funky_monkey"#,
+        name: "funky_monkey",
     };
 
     Scene {

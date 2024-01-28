@@ -32,7 +32,7 @@ fn main() {
             background_color: V3::new(0.5, 0.7, 1.0),
             depth: 32,
         },
-        name: r#"diffuse_sphere"#,
+        name: "diffuse_sphere",
     };
 
     Scene {

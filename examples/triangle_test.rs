@@ -61,7 +61,7 @@ fn main() {
             background_color: V3::new(0.5, 0.7, 1.0),
             depth: 32,
         },
-        name: r#"triangle_test"#,
+        name: "triangle_test",
     };
 
     Scene {
