@@ -14,7 +14,7 @@ permutation_iterator = "0.1.2"
 arr_macro = "0.1.3"
 wavefront_obj = "8.0.0"
 png = "0.16.5"
-enum_dispatch = "0.3.7"
+enum_dispatch = "0.3.12"
 
 [profile.release]
 lto = "fat"
@@ -23,3 +23,14 @@ panic = "abort"
 
 [patch.crates-io]
 lexical-core = {git = 'https://github.com/Gelbpunkt/rust-lexical', branch = 'fix-warnings-and-update-deps'}
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "spheres"
+harness = false
+
+[[bench]]
+name = "pegasus"
+harness = false
