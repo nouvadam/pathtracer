@@ -8,8 +8,7 @@ use crate::V3;
 /// Mesh of triangles, or polygon model
 #[derive(Clone)]
 pub struct Mesh {
-    triangles: Box<BvhNode>,
-    material: usize,
+    triangles: BvhNode,
     bounding_box: Aabb,
 }
 
@@ -76,8 +75,7 @@ impl Mesh {
         let bounding_box = triangles_list.bounding_box();
 
         Ok(Primitive::Mesh(Mesh {
-            triangles: Box::new(BvhNode::new(&triangles_list)),
-            material,
+            triangles: BvhNode::new(&triangles_list),
             bounding_box,
         }))
     }
