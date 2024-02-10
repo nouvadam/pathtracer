@@ -226,7 +226,7 @@ impl Pdf for XZrect {
             time: 1.0,
             setting: &RaySetting {
                 depth: 32,
-                background_color: V3::zero(),
+                background_color: V3::default(),
             },
         };
 
@@ -261,7 +261,7 @@ impl Pdf for XYrect {
             time: 1.0,
             setting: &RaySetting {
                 depth: 32,
-                background_color: V3::zero(),
+                background_color: V3::default(),
             },
         };
 
@@ -296,7 +296,7 @@ impl Pdf for YZrect {
             time: 1.0,
             setting: &RaySetting {
                 depth: 32,
-                background_color: V3::zero(),
+                background_color: V3::default(),
             },
         };
 

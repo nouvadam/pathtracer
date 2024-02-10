@@ -35,7 +35,7 @@ impl MaterialTrait for Lambertian {
     }
 
     fn color_emitted(&self, _ray: &Ray, _hit: &Hit) -> V3<f32> {
-        V3::zero()
+        V3::default()
     }
 }
 

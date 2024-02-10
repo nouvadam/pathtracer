@@ -1,6 +1,7 @@
 use num_traits::Float;
 use rand::Rng;
 use std::ops::{Add, Div, Mul, Neg, Sub};
+
 /// Simple 3d vector library.
 #[derive(Copy, Debug, PartialEq, PartialOrd, Clone, Default)]
 pub struct V3<T> {
@@ -56,9 +57,9 @@ impl<T: Copy> Iterator for V3IntoIterator<T> {
 }
 
 use std::iter::FromIterator;
-impl<T: Float> FromIterator<T> for V3<T> {
+impl<T: Default> FromIterator<T> for V3<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut v3 = V3::zero();
+        let mut v3 = V3::default();
 
         for (index, i) in iter.into_iter().enumerate() {
             match index {
@@ -157,14 +158,6 @@ impl<
             + Float,
     > V3<T>
 {
-    /// Returns new Vector with zero value at each element.
-    pub fn zero() -> V3<T> {
-        V3 {
-            x: T::zero(),
-            y: T::zero(),
-            z: T::zero(),
-        }
-    }
     /// Returns length of the vector.
     pub fn length(self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()

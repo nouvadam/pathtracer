@@ -30,7 +30,7 @@ impl MaterialTrait for LightSource {
         if hit.front_face {
             self.albedo.value(hit.u, hit.v, hit.point)
         } else {
-            V3::zero()
+            V3::default()
         }
     }
 }

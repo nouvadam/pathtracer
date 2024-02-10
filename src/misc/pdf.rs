@@ -22,7 +22,7 @@ impl Pdf for ZeroPdf {
     }
     // Should not be used
     fn generate(&self, _origin: V3<f32>) -> V3<f32> {
-        V3::zero()
+        V3::default()
     }
 }
 

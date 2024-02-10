@@ -27,7 +27,7 @@ impl MaterialTrait for Isotropic {
     }
 
     fn color_emitted(&self, _ray_in: &Ray, _hit: &Hit) -> V3<f32> {
-        V3::zero()
+        V3::default()
     }
 }
 

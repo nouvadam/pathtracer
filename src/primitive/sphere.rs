@@ -82,7 +82,7 @@ impl Pdf for Sphere {
             time: 1.0,
             setting: &RaySetting {
                 depth: 32,
-                background_color: V3::zero(),
+                background_color: V3::default(),
             },
         };
 
