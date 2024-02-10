@@ -38,7 +38,7 @@ fn main() {
         ))
     });
 
-    objects.add(Primitive::BvhNode(BvhNode::new(&boxes)));
+    objects.add(BvhNode::new(&boxes));
 
     let light = materials.add(LightSource::new(Box::new(ConstantTexture {
         color: V3::new(7.0, 7.0, 7.0),
@@ -133,7 +133,7 @@ fn main() {
     });
 
     objects.add(
-        Primitive::BvhNode(BvhNode::new(&boxes2))
+        BvhNode::new(&boxes2)
             .rotate(V3::new(0.0, 1.0, 0.0), 0.261_799_4)
             .translate(V3::new(-100.0, 270.0, 395.0)),
     );

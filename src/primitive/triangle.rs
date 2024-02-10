@@ -78,13 +78,13 @@ impl Triangle {
     /// `normals` - Normals of corresponding verticles.
     ///
     /// `material` - Material of created Triangle.
-    pub fn new(verticles: V3<V3<f32>>, normals: Option<V3<V3<f32>>>, material: usize) -> Primitive {
-        Primitive::Triangle(Triangle {
+    pub fn new(verticles: V3<V3<f32>>, normals: Option<V3<V3<f32>>>, material: usize) -> Self {
+        Triangle {
             verticles: [verticles.x, verticles.y, verticles.z],
             normals: normals.map(|normals| [normals.x, normals.y, normals.z]),
             material,
             bounding_box: Self::init_bounding_box(&verticles),
-        })
+        }
     }
 
     fn init_bounding_box(verticles: &V3<V3<f32>>) -> Aabb {

@@ -64,11 +64,11 @@ fn main() {
 
     lights.add(XZrect::new(213.0, 343.0, 227.0, 332.0, 554.0, light).flip_face());
 
-    lights.add(Primitive::Sphere(Sphere {
+    lights.add(Sphere {
         center: V3::new(190.0, 90.0, 190.0),
         radius: 90.0,
         material: glass,
-    }));
+    });
 
     let image_config = ImageConfig {
         nx: 1024,

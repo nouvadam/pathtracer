@@ -86,7 +86,7 @@ fn main() {
         }))),
     ));
 
-    hittable.add(Primitive::BvhNode(BvhNode::new(&hittable2)));
+    hittable.add(BvhNode::new(&hittable2));
 
     let image_config = ImageConfig {
         nx: 2048,

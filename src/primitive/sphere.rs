@@ -65,12 +65,12 @@ impl Hittable for Sphere {
 
 impl Sphere {
     /// Creates new Xyrect primitive.
-    pub fn new(center: V3<f32>, radius: f32, material: usize) -> Primitive {
-        Primitive::Sphere(Sphere {
+    pub fn new(center: V3<f32>, radius: f32, material: usize) -> Self {
+        Sphere {
             center,
             radius,
             material,
-        })
+        }
     }
 }
 

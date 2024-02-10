@@ -1,13 +1,13 @@
 use crate::hittables::Aabb;
-use crate::misc::Pdf;
-use crate::{Hit, Hittable, Primitive, Ray, V3};
+use crate::misc::{HittablePdf, Pdf};
+use crate::{Hit, Hittable, Ray, V3};
 /// Represents translated object.
 #[derive(Clone)]
 pub struct Translated {
     /// Object position is translated by this vector.
     offset: V3<f32>,
     /// Object that is translated.
-    hittable: Box<Primitive>,
+    hittable: Box<dyn HittablePdf>,
 }
 
 impl Hittable for Translated {
@@ -42,16 +42,19 @@ impl Hittable for Translated {
 /// Transforms object into Translated object
 pub trait IntoTranslated {
     /// Transforms object into Translated object
-    fn translate(self, offset: V3<f32>) -> Primitive;
+    fn translate(self, offset: V3<f32>) -> Translated;
 }
 
 // Trait IntoTranslated is implemented for all hittable objects
-impl IntoTranslated for Primitive {
-    fn translate(self, offset: V3<f32>) -> Primitive {
-        Primitive::Translated(Translated {
+impl<T> IntoTranslated for T
+where
+    T: HittablePdf + 'static,
+{
+    fn translate(self, offset: V3<f32>) -> Translated {
+        Translated {
             offset,
             hittable: Box::new(self),
-        })
+        }
     }
 }
 

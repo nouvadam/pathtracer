@@ -2,43 +2,44 @@ use std::time::Duration;
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use pathtracer::hittables::BvhNode;
+use pathtracer::hittables::HittableList;
 use pathtracer::material::*;
 use pathtracer::primitive::*;
 use pathtracer::*;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
-    let mut hittable = Vec::new();
+    let mut hittable = HittableList::new();
     let mut materials = MaterialContainer::new();
 
     //ground
-    hittable.push(Sphere::new(
+    hittable.add(Sphere::new(
         V3::new(0.0, -100.5, -1.0),
         100.0,
         materials.add(Metalic::new(V3::new(0.8, 0.8, 0.0), 1.0)),
     ));
 
     //center
-    hittable.push(Sphere::new(
+    hittable.add(Sphere::new(
         V3::new(0.0, 0.0, -1.0),
         0.5,
         materials.add(Metalic::new(V3::new(0.1, 0.2, 0.5), 1.0)),
     ));
 
     //left
-    hittable.push(Sphere::new(
+    hittable.add(Sphere::new(
         V3::new(-1.0, 0.0, -1.0),
         0.5,
         materials.add(Dielectric::new(1.5)),
     ));
 
-    hittable.push(Sphere::new(
+    hittable.add(Sphere::new(
         V3::new(-1.0, 0.0, -1.0),
         -0.45,
         materials.add(Dielectric::new(1.5)),
     ));
 
     //right
-    hittable.push(Sphere::new(
+    hittable.add(Sphere::new(
         V3::new(1.0, 0.0, -1.0),
         0.5,
         materials.add(Metalic::new(V3::new(0.8, 0.6, 0.2), 0.0)),
@@ -67,7 +68,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
             0.0,                     //time0
             1.0,                     //time1
         ),
-        world: BvhNode::new(&hittables::HittableList { list: hittable }),
+        world: BvhNode::new(&hittable),
         lights: None,
         materials,
     };

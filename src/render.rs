@@ -69,7 +69,7 @@ impl Render for Scene {
                         + self
                             .camera
                             .get_ray(u, v, &image_config.ray_setting)
-                            .get_color(&self);
+                            .get_color(self);
                 }
 
                 (pixel.1, pixel.0, color)

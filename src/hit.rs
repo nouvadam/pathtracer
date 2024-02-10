@@ -70,10 +70,7 @@ impl Hit {
     }
 }
 
-use enum_dispatch::enum_dispatch;
 #[clonable]
-#[enum_dispatch(Primitive)]
-
 /// Hittables are able to be hit by Rays.
 pub trait Hittable: Send + Sync + Clone {
     /// Returns Hit structure, if Ray intersects with this object surface in passed time interval.
@@ -84,30 +81,4 @@ pub trait Hittable: Send + Sync + Clone {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit>;
     /// Returns bounding box of the object
     fn bounding_box(&self) -> Aabb;
-}
-
-use crate::hittables::*;
-/// Objects implementing this trait can be hit by rays.
-use crate::primitive::*;
-use crate::transform::*;
-
-#[enum_dispatch]
-#[derive(Clone)]
-
-/// Primitive implements Hittable trait, thus could be hit by ray.
-pub enum Primitive {
-    HitBox,
-    Mesh,
-    MovingSphere,
-    XYrect,
-    XZrect,
-    YZrect,
-    Sphere,
-    Triangle,
-    BvhNode,
-    HittableList,
-    FlipFace,
-    Rotated,
-    Translated,
-    ConstantMedium,
 }

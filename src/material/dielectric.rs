@@ -26,15 +26,13 @@ impl MaterialTrait for Dielectric {
 
         let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
 
-        let direction: V3<f32>;
-
-        if (etai_over_etat * sin_theta > 1.0)
+        let direction: V3<f32> = if (etai_over_etat * sin_theta > 1.0)
             || (rand::thread_rng().gen_range(0.0, 1.0) < schlick(cos_theta, etai_over_etat))
         {
-            direction = reflect(unit_direction, hit.normal);
+            reflect(unit_direction, hit.normal)
         } else {
-            direction = refract(unit_direction, hit.normal, etai_over_etat);
-        }
+            refract(unit_direction, hit.normal, etai_over_etat)
+        };
 
         Some(ScatterRecord {
             specular_ray: Some(Ray {
@@ -47,18 +45,18 @@ impl MaterialTrait for Dielectric {
         })
     }
 
-    fn scattering_pdf<'a>(&self, _ray_in: &'a Ray, _hit: &Hit, _ray_scattered: &Ray) -> f32 {
+    fn scattering_pdf(&self, _ray_in: &Ray, _hit: &Hit, _ray_scattered: &Ray) -> f32 {
         todo!()
     }
 
-    fn color_emitted<'a>(&self, _ray_in: &'a Ray, _hit: &Hit) -> V3<f32> {
+    fn color_emitted(&self, _ray_in: &Ray, _hit: &Hit) -> V3<f32> {
         todo!()
     }
 }
 
 impl Dielectric {
     /// Returns new Dielectric material.
-    pub fn new(refractive_index: f32) -> Material {
-        Material::Dielectric(Dielectric { refractive_index })
+    pub fn new(refractive_index: f32) -> Self {
+        Dielectric { refractive_index }
     }
 }

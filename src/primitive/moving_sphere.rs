@@ -29,13 +29,13 @@ impl MovingSphere {
         time_range: (f32, f32),
         radius: f32,
         material: usize,
-    ) -> Primitive {
-        Primitive::MovingSphere(Self {
+    ) -> Self {
+        Self {
             centers,
             time_range,
             radius,
             material,
-        })
+        }
     }
 }
 

@@ -32,18 +32,18 @@ impl MaterialTrait for Metalic {
         })
     }
 
-    fn scattering_pdf<'a>(&self, _ray_in: &'a Ray, _hit: &Hit, _ray_scattered: &Ray) -> f32 {
+    fn scattering_pdf(&self, _ray_in: &Ray, _hit: &Hit, _ray_scattered: &Ray) -> f32 {
         todo!()
     }
 
-    fn color_emitted<'a>(&self, _ray_in: &'a Ray, _hit: &Hit) -> V3<f32> {
+    fn color_emitted(&self, _ray_in: &Ray, _hit: &Hit) -> V3<f32> {
         todo!()
     }
 }
 
 impl Metalic {
     /// Returns new Dielectric material.
-    pub fn new(albedo: V3<f32>, fuzz: f32) -> Material {
-        Material::Metalic(Metalic { albedo, fuzz })
+    pub fn new(albedo: V3<f32>, fuzz: f32) -> Self {
+        Metalic { albedo, fuzz }
     }
 }

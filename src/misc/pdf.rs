@@ -7,8 +7,6 @@ pub use crate::V3;
 use objekt_clonable::*;
 
 /// Represents probability density function
-//#[clonable]
-#[enum_dispatch(Primitive)]
 pub trait Pdf {
     /// Gives value of this Pdf for given direction, or "probability" of given direction to sample from this Pdf.
     fn value(&self, origin: V3<f32>, direction: V3<f32>) -> f32;
@@ -109,8 +107,8 @@ where
     }
 }
 
-use enum_dispatch::enum_dispatch;
 #[clonable]
 /// HittablePdf represents structs that have PDF property and can be hit by ray.
-#[enum_dispatch(Primitive)]
 pub trait HittablePdf: Hittable + Pdf + Send + Sync + Clone {}
+
+impl<T> HittablePdf for T where T: Pdf + Hittable {}

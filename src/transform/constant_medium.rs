@@ -1,6 +1,5 @@
 use crate::hittables::Aabb;
-use crate::misc::Pdf;
-use crate::Primitive;
+use crate::misc::{HittablePdf, Pdf};
 use crate::{Hit, Hittable, Ray, V3};
 
 use rand::Rng;
@@ -8,7 +7,7 @@ use rand::Rng;
 #[derive(Clone)]
 pub struct ConstantMedium {
     /// The primitive that was transformed into smoke.
-    boundary: Box<Primitive>,
+    boundary: Box<dyn HittablePdf>,
     /// Some material that gives color when Ray hits the object.
     phase_function: usize,
     /// Some sort of inversed probability that Ray will scatter inside the object.
@@ -73,16 +72,19 @@ pub trait IntoConstantMedium {
     /// `neg_inv_density` - Inversed probability that Ray will scatter inside the object.
     ///
     /// `phase_function` - Material that gives color when Ray scatter inside the object.
-    fn into_constant_medium(self, neg_inv_density: f32, phase_function: usize) -> Primitive;
+    fn into_constant_medium(self, neg_inv_density: f32, phase_function: usize) -> ConstantMedium;
 }
 
-impl IntoConstantMedium for Primitive {
-    fn into_constant_medium(self, neg_inv_density: f32, phase_function: usize) -> Primitive {
-        Primitive::ConstantMedium(ConstantMedium {
+impl<T> IntoConstantMedium for T
+where
+    T: HittablePdf + 'static,
+{
+    fn into_constant_medium(self, neg_inv_density: f32, phase_function: usize) -> ConstantMedium {
+        ConstantMedium {
             boundary: Box::new(self),
             phase_function,
             neg_inv_density: -1.0 / neg_inv_density,
-        })
+        }
     }
 }
 

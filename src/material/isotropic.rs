@@ -22,18 +22,18 @@ impl MaterialTrait for Isotropic {
         })
     }
 
-    fn scattering_pdf<'a>(&self, _ray_in: &'a Ray, _hit: &Hit, _ray_scattered: &Ray) -> f32 {
+    fn scattering_pdf(&self, _ray_in: &Ray, _hit: &Hit, _ray_scattered: &Ray) -> f32 {
         1.0 / (4.0 * std::f32::consts::PI)
     }
 
-    fn color_emitted<'a>(&self, _ray_in: &'a Ray, _hit: &Hit) -> V3<f32> {
+    fn color_emitted(&self, _ray_in: &Ray, _hit: &Hit) -> V3<f32> {
         V3::zero()
     }
 }
 
 impl Isotropic {
     /// Returns new Dielectric material.
-    pub fn new(albedo: Box<dyn Texture + Sync + Send>) -> Material {
-        Material::Isotropic(Isotropic { albedo })
+    pub fn new(albedo: Box<dyn Texture + Sync + Send>) -> Self {
+        Isotropic { albedo }
     }
 }

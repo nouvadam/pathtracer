@@ -1,6 +1,5 @@
-use crate::hit::Primitive;
 use crate::hittables::Aabb;
-use crate::misc::Pdf;
+use crate::misc::{HittablePdf, Pdf};
 use crate::{Hit, Hittable, Ray, V3};
 
 /// Represents a hittable object that was rotated by some angle around some axis.
@@ -15,7 +14,7 @@ pub struct Rotated {
     /// Bounding box of the rotated object.
     bounding_box: Aabb,
     /// Object that is rotated.
-    hittable: Box<Primitive>,
+    hittable: Box<dyn HittablePdf>,
 }
 
 impl Hittable for Rotated {
@@ -47,12 +46,15 @@ impl Hittable for Rotated {
 /// Transforms object into Rotated object
 pub trait IntoRotated {
     /// Transforms object into Rotated object
-    fn rotate(self, axis: V3<f32>, angle: f32) -> Primitive; //Box<Rotated<'mat>>;
+    fn rotate(self, axis: V3<f32>, angle: f32) -> Rotated; //Box<Rotated<'mat>>;
 }
 
 // All hittable objects now implements 'rotate' method, that takes ownership of underlying hittable object, creates new Rotated object that surrounds hittable with rotation info, and returns that new object
-impl IntoRotated for Primitive {
-    fn rotate(self, axis: V3<f32>, angle: f32) -> Primitive {
+impl<T> IntoRotated for T
+where
+    T: HittablePdf + 'static,
+{
+    fn rotate(self, axis: V3<f32>, angle: f32) -> Rotated {
         let angle = angle / 2.0;
 
         // Needed for quaterion rotation
@@ -94,13 +96,13 @@ impl IntoRotated for Primitive {
             })
             .collect::<V3<f32>>();
 
-        Primitive::Rotated(Rotated {
+        Rotated {
             sin_theta,
             cos_theta,
             axis,
             bounding_box: Aabb { min, max },
             hittable: Box::new(self),
-        })
+        }
     }
 }
 

@@ -2,7 +2,6 @@ use crate::hit::*;
 use crate::hittables::{Aabb, BvhNode, HittableList};
 use crate::misc::Pdf;
 use crate::primitive::triangle::*;
-use crate::primitive::Primitive;
 use crate::ray::*;
 use crate::V3;
 /// Mesh of triangles, or polygon model
@@ -38,7 +37,7 @@ impl Mesh {
     /// `file_path` - Path to the .obj file.
     ///
     /// `material` - Material of the model.
-    pub fn new(file_path: &str, material: usize) -> Result<Primitive, std::io::Error> {
+    pub fn new(file_path: &str, material: usize) -> Result<Self, std::io::Error> {
         use std::fs;
         let file_to_parse = fs::read_to_string(file_path)?;
 
@@ -74,10 +73,10 @@ impl Mesh {
 
         let bounding_box = triangles_list.bounding_box();
 
-        Ok(Primitive::Mesh(Mesh {
+        Ok(Mesh {
             triangles: BvhNode::new(&triangles_list),
             bounding_box,
-        }))
+        })
     }
 }
 

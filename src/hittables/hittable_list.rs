@@ -1,24 +1,24 @@
 use crate::hit::*;
 use crate::hittables::Aabb;
-use crate::misc::Pdf;
+use crate::misc::{HittablePdf, Pdf};
 use crate::ray::Ray;
 
 /// hittable objects aggregated into list.
 #[derive(Clone, Default)]
 pub struct HittableList {
     /// Underlying list of hittable objects
-    pub list: Vec<Primitive>,
+    pub list: Vec<Box<dyn HittablePdf>>,
 }
 
-impl<'mat> HittableList {
+impl HittableList {
     /// Creates new list
     pub fn new() -> HittableList {
         HittableList { list: Vec::new() }
     }
 
     /// Adds object to the list
-    pub fn add(&mut self, object: Primitive) {
-        self.list.push(object);
+    pub fn add<T: HittablePdf + 'static>(&mut self, object: T) {
+        self.list.push(Box::new(object));
     }
 }
 

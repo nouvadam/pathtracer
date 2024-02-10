@@ -64,15 +64,15 @@ impl Hittable for XYrect {
 
 impl XYrect {
     /// Creates new Xyrect primitive.
-    pub fn new(x0: f32, x1: f32, y0: f32, y1: f32, k: f32, material: usize) -> Primitive {
-        Primitive::XYrect(XYrect {
+    pub fn new(x0: f32, x1: f32, y0: f32, y1: f32, k: f32, material: usize) -> Self {
+        XYrect {
             x0,
             x1,
             y0,
             y1,
             k,
             material,
-        })
+        }
     }
 }
 
@@ -135,15 +135,15 @@ impl Hittable for XZrect {
 
 impl XZrect {
     /// Creates new Xyrect primitive.
-    pub fn new(x0: f32, x1: f32, z0: f32, z1: f32, k: f32, material: usize) -> Primitive {
-        Primitive::XZrect(XZrect {
+    pub fn new(x0: f32, x1: f32, z0: f32, z1: f32, k: f32, material: usize) -> Self {
+        XZrect {
             x0,
             x1,
             z0,
             z1,
             k,
             material,
-        })
+        }
     }
 }
 
@@ -206,15 +206,15 @@ impl Hittable for YZrect {
 
 impl YZrect {
     /// Creates new Xyrect primitive.
-    pub fn new(y0: f32, y1: f32, z0: f32, z1: f32, k: f32, material: usize) -> Primitive {
-        Primitive::YZrect(YZrect {
+    pub fn new(y0: f32, y1: f32, z0: f32, z1: f32, k: f32, material: usize) -> Self {
+        YZrect {
             y0,
             y1,
             z0,
             z1,
             k,
             material,
-        })
+        }
     }
 }
 
@@ -322,5 +322,3 @@ impl Pdf for YZrect {
         random_point - origin
     }
 }
-
-//impl HittablePdf for XZrect<'_> {}

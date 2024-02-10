@@ -1,5 +1,4 @@
 use crate::hit::*;
-use crate::material::*;
 use crate::misc::{MixturePdf, Pdf};
 use crate::Scene;
 use crate::V3;
@@ -48,7 +47,7 @@ impl Ray<'_> {
             // If ray hit some object, then we bounce that Ray from the object with updated color.
             Some(hit) => {
                 let material = scene.materials.get(hit.material);
-                match material.scatter(&self, &hit) {
+                match material.scatter(self, &hit) {
                     // Scatter ray from a hit point
 
                     // Ray has been scattered
@@ -78,7 +77,6 @@ impl Ray<'_> {
                                 setting: self.setting,
                             };
 
-                            
                             match scatter_record.specular_ray {
                                 Some(ray) => {
                                     // Returns specular ray.
@@ -86,9 +84,9 @@ impl Ray<'_> {
                                 }
                                 None => {
                                     // Returns scattered ray.
-                                    material.color_emitted(&self, &hit)
+                                    material.color_emitted(self, &hit)
                                         + ((scatter_record.attenuation
-                                            * material.scattering_pdf(&self, &hit, &scattered_ray))
+                                            * material.scattering_pdf(self, &hit, &scattered_ray))
                                         .mul(scattered_ray.color(scene, depth + 1))
                                             / pdf_val)
                                 }
@@ -99,7 +97,7 @@ impl Ray<'_> {
                         }
                     }
                     // If scatter hasn't produced Ray, at example in case of absorbing the Ray, then the resulting color of the Ray is emitted light by the object.
-                    None => material.color_emitted(&self, &hit),
+                    None => material.color_emitted(self, &hit),
                 }
             }
             // No intersections occured, thus Ray came from the background.

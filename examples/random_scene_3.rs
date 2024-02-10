@@ -111,7 +111,7 @@ fn main() {
     ));
     hittable2.add(Sphere::new(V3::new(0.0, 1.0, 0.0), 1.0, glass_material));
 
-    hittable.add(Primitive::BvhNode(BvhNode::new(&hittable2)));
+    hittable.add(BvhNode::new(&hittable2));
 
     let image_config = ImageConfig {
         nx: 2048,

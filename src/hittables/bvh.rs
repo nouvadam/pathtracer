@@ -1,6 +1,6 @@
 use crate::hit::*;
 use crate::hittables::{Aabb, HittableList};
-use crate::misc::Pdf;
+use crate::misc::{HittablePdf, Pdf};
 use crate::ray::*;
 use rand::Rng;
 
@@ -8,8 +8,8 @@ use rand::Rng;
 /// Octtree that contains Scene, for checking ray intersections in O(nlog(n)) time rather than in O(n^2)
 pub struct BvhNode {
     boxx: Aabb,
-    left: Box<Primitive>,
-    right: Box<Primitive>,
+    left: Box<dyn HittablePdf>,
+    right: Box<dyn HittablePdf>,
 }
 
 impl Hittable for BvhNode {
@@ -84,15 +84,15 @@ impl BvhNode {
                 boxx: sorted[0]
                     .bounding_box()
                     .surrounding_box(sorted[0].bounding_box()),
-                left: Box::new(sorted[0].clone()),
-                right: Box::new(sorted[0].clone()),
+                left: sorted[0].clone(),
+                right: sorted[0].clone(),
             },
             2 => BvhNode {
                 boxx: sorted[0]
                     .bounding_box()
                     .surrounding_box(sorted[1].bounding_box()),
-                left: Box::new(sorted[0].clone()),
-                right: Box::new(sorted[1].clone()),
+                left: sorted[0].clone(),
+                right: sorted[1].clone(),
             },
             _ => {
                 let left = BvhNode::new(&HittableList {
@@ -103,8 +103,8 @@ impl BvhNode {
                 });
                 BvhNode {
                     boxx: left.boxx.surrounding_box(right.boxx.clone()),
-                    left: Box::new(Primitive::BvhNode(left)),
-                    right: Box::new(Primitive::BvhNode(right)),
+                    left: Box::new(left),
+                    right: Box::new(right),
                 }
             }
         }

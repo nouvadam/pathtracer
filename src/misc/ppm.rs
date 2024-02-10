@@ -98,7 +98,7 @@ impl Ppm {
     /// Write Ppm into file with given `filename`.
     pub fn write_file(&self, filename: &str) -> std::io::Result<()> {
         let path = Path::new(filename);
-        let mut file = File::create(&path)?;
+        let mut file = File::create(path)?;
         let header = format!("P6 {} {} 255\n", self.width, self.height);
         file.write_all(header.as_bytes())?;
         file.write_all(&self.data)?;

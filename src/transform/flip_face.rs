@@ -1,11 +1,11 @@
 use crate::hittables::Aabb;
-use crate::misc::Pdf;
-use crate::{Hit, Hittable, Primitive, Ray};
+use crate::misc::{HittablePdf, Pdf};
+use crate::{Hit, Hittable, Ray};
 /// FlipFace represents primitive with flipped normals.
 #[derive(Clone)]
 pub struct FlipFace {
     /// Object that it's normal vectors are flipped.
-    hittable: Box<Primitive>,
+    hittable: Box<dyn HittablePdf>,
 }
 
 impl Hittable for FlipFace {
@@ -36,14 +36,17 @@ impl Pdf for FlipFace {
 /// Transforms object into FlipFace object
 pub trait IntoFlipFace {
     /// Transforms object into Translated object
-    fn flip_face(self) -> Primitive;
+    fn flip_face(self) -> FlipFace;
 }
 
 // Trait IntoTranslated is implemented for all hittable objects
-impl<'mat> IntoFlipFace for Primitive {
-    fn flip_face(self) -> Primitive {
-        Primitive::FlipFace(FlipFace {
+impl<T> IntoFlipFace for T
+where
+    T: HittablePdf + 'static,
+{
+    fn flip_face(self) -> FlipFace {
+        FlipFace {
             hittable: Box::new(self),
-        })
+        }
     }
 }

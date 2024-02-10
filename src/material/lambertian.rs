@@ -1,5 +1,5 @@
 use crate::hit::Hit;
-use crate::material::{Material, MaterialTrait};
+use crate::material::MaterialTrait;
 use crate::misc::CosinePdf;
 use crate::ray::Ray;
 use crate::texture::Texture;
@@ -24,7 +24,7 @@ impl MaterialTrait for Lambertian {
         })
     }
 
-    fn scattering_pdf<'a>(&self, _ray_in: &'a Ray, hit: &Hit, ray_scattered: &Ray) -> f32 {
+    fn scattering_pdf(&self, _ray_in: &Ray, hit: &Hit, ray_scattered: &Ray) -> f32 {
         let cosine = ray_scattered.end.norm().dot(hit.normal);
 
         if cosine < 0.0 {
@@ -41,7 +41,7 @@ impl MaterialTrait for Lambertian {
 
 impl Lambertian {
     /// Returns new Dielectric material.
-    pub fn new(albedo: Box<dyn Texture + Sync + Send>) -> Material {
-        Material::Lambertian(Lambertian { albedo })
+    pub fn new(albedo: Box<dyn Texture + Sync + Send>) -> Self {
+        Lambertian { albedo }
     }
 }

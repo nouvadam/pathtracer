@@ -15,13 +15,10 @@ pub use metalic::Metalic;
 use crate::hit::Hit;
 use crate::misc::Pdf;
 use crate::ray::Ray;
-use crate::texture::ConstantTexture;
 use crate::V3;
-use enum_dispatch::enum_dispatch;
 
 /// Each object that implements Material trait should be able to scatter incoming ray.
 
-#[enum_dispatch(Material)]
 pub trait MaterialTrait: Send + Sync {
     /// Returns scattered ray from the surface of the object with given material.
     /// Takes:
@@ -33,10 +30,10 @@ pub trait MaterialTrait: Send + Sync {
     fn scatter<'a>(&self, ray_in: &'a Ray, hit: &Hit) -> Option<ScatterRecord<'a>>;
 
     /// Returns value of probability density function of scattered ray given the material and incoming ray, to weight the scattered ray influence on the overall color of the pixel, because less probable scattered rays are less frequent.
-    fn scattering_pdf<'a>(&self, ray_in: &'a Ray, hit: &Hit, ray_scattered: &Ray) -> f32;
+    fn scattering_pdf(&self, ray_in: &Ray, hit: &Hit, ray_scattered: &Ray) -> f32;
 
     /// Returns albedo of emitted light on specific point on object.
-    fn color_emitted<'a>(&self, ray_in: &'a Ray, hit: &Hit) -> V3<f32>;
+    fn color_emitted(&self, ray_in: &Ray, hit: &Hit) -> V3<f32>;
 }
 
 /// ScatterRecord represents ray scatter instance.
@@ -47,21 +44,6 @@ pub struct ScatterRecord<'ray> {
     pub attenuation: V3<f32>,
     /// PDF corresponding to this record.
     pub pdf: Box<dyn Pdf>,
-}
-
-#[enum_dispatch]
-/// Material implements MaterialTrait, thus can scatter incoming rays etc.
-pub enum Material {
-    /// Dielectric material.
-    Dielectric,
-    /// Isotropic material.
-    Isotropic,
-    /// Lambertian material.
-    Lambertian,
-    /// Metalic material.
-    Metalic,
-    /// LightSource material.
-    LightSource,
 }
 
 // Various functions needed to compute reflections, refractions etc.
@@ -100,8 +82,8 @@ pub fn schlick(cosine: f32, refractive_index: f32) -> f32 {
 }
 /// Contains materials
 pub struct MaterialContainer {
-    materials: Vec<Material>,
-    none_material: Material,
+    materials: Vec<Box<dyn MaterialTrait>>,
+    none_material: Box<dyn MaterialTrait>,
 }
 
 impl MaterialContainer {
@@ -109,23 +91,21 @@ impl MaterialContainer {
     pub fn new() -> MaterialContainer {
         MaterialContainer {
             materials: Vec::new(),
-            none_material: Lambertian::new(Box::new(ConstantTexture {
-                color: V3::new(1.0, 0.0, 1.0),
-            })),
+            none_material: Box::new(Metalic::new(V3::new(0.8, 0.8, 0.9), 1.0)),
         }
     }
 
     /// Adds new material to container, returns it's index
-    pub fn add(&mut self, mat: Material) -> usize {
-        self.materials.push(mat);
+    pub fn add<T: MaterialTrait + 'static>(&mut self, mat: T) -> usize {
+        self.materials.push(Box::new(mat));
         self.materials.len() - 1
     }
 
     /// Returns material from container, if material doesnt exists under given index, returns default material (magneta)
-    pub fn get(&self, index: usize) -> &Material {
+    pub fn get(&self, index: usize) -> &dyn MaterialTrait {
         match self.materials.get(index) {
-            Some(mat) => mat,
-            None => &self.none_material,
+            Some(mat) => mat.as_ref(),
+            None => self.none_material.as_ref(),
         }
     }
 }

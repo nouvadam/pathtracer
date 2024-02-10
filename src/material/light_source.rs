@@ -16,7 +16,7 @@ impl MaterialTrait for LightSource {
         None
     }
 
-    fn scattering_pdf<'a>(&self, _ray_in: &'a Ray, hit: &Hit, ray_scattered: &Ray) -> f32 {
+    fn scattering_pdf(&self, _ray_in: &Ray, hit: &Hit, ray_scattered: &Ray) -> f32 {
         let cosine = ray_scattered.end.norm().dot(hit.normal);
 
         if cosine < 0.0 {
@@ -26,7 +26,7 @@ impl MaterialTrait for LightSource {
         }
     }
 
-    fn color_emitted<'a>(&self, _ray_in: &'a Ray, hit: &Hit) -> V3<f32> {
+    fn color_emitted(&self, _ray_in: &Ray, hit: &Hit) -> V3<f32> {
         if hit.front_face {
             self.albedo.value(hit.u, hit.v, hit.point)
         } else {
@@ -37,7 +37,7 @@ impl MaterialTrait for LightSource {
 
 impl LightSource {
     /// Returns new Dielectric material.
-    pub fn new(albedo: Box<dyn Texture + Sync + Send>) -> Material {
-        Material::LightSource(LightSource { albedo })
+    pub fn new(albedo: Box<dyn Texture + Sync + Send>) -> Self {
+        LightSource { albedo }
     }
 }
