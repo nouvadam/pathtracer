@@ -4,6 +4,7 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use pathtracer::hittables::BvhNode;
 use pathtracer::hittables::HittableList;
 use pathtracer::material::*;
+use pathtracer::misc::Interval;
 use pathtracer::primitive::*;
 use pathtracer::texture::ConstantTexture;
 use pathtracer::transform::IntoFlipFace;
@@ -125,6 +126,10 @@ pub fn criterion_benchmark(c: &mut Criterion) {
         ray_setting: RaySetting {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 16,
+            ray_time: Interval {
+                min: 0.001,
+                max: 2048.0,
+            },
         },
         name: "pegasus",
     };

@@ -76,9 +76,7 @@ pub trait Hittable: Send + Sync + Clone {
     /// Returns Hit structure, if Ray intersects with this object surface in passed time interval.
     ///
     /// `r` - Ray that should hit the object.
-    ///
-    /// `t_min`, `t_max` - Time interval in which hit should occur.
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit>;
+    fn hit(&self, ray: &Ray) -> Option<Hit>;
     /// Returns bounding box of the object
     fn bounding_box(&self) -> Aabb;
 }

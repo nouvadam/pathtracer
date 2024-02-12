@@ -16,11 +16,11 @@ pub struct Triangle {
 }
 
 impl Hittable for Triangle {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
         let v0v1 = self.verticles[1] - self.verticles[0];
         let v0v2 = self.verticles[2] - self.verticles[0];
 
-        let pvec = r.end.cross(v0v2);
+        let pvec = ray.end.cross(v0v2);
         let det = v0v1.dot(pvec);
         let inv_det = 1.0 / det;
         let epsilon = 0.0000001;
@@ -29,7 +29,7 @@ impl Hittable for Triangle {
             return None;
         }
 
-        let tvec = r.origin - self.verticles[0];
+        let tvec = ray.origin - self.verticles[0];
         let u = tvec.dot(pvec) * inv_det;
 
         if !(0.0..=1.0).contains(&u) {
@@ -37,7 +37,7 @@ impl Hittable for Triangle {
         }
 
         let qvec = tvec.cross(v0v1);
-        let v = r.end.dot(qvec) * inv_det;
+        let v = ray.end.dot(qvec) * inv_det;
 
         if v < 0.0 || u + v > 1.0 {
             return None;
@@ -45,7 +45,7 @@ impl Hittable for Triangle {
 
         let t = v0v2.dot(qvec) * inv_det;
 
-        if t < t_min || t > t_max {
+        if t < ray.setting.ray_time.min || t > ray.setting.ray_time.max {
             return None;
         }
 
@@ -55,10 +55,10 @@ impl Hittable for Triangle {
         };
 
         Some(Hit::new(
-            r,
+            ray,
             normal_to_triangle,
             t,
-            r.point_at_param(t),
+            ray.point_at_param(t),
             self.material,
             u,
             v,

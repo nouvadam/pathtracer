@@ -1,5 +1,6 @@
 use crate::hit::*;
 use crate::hittables::Aabb;
+use crate::misc::Interval;
 use crate::misc::Pdf;
 use crate::ray::*;
 use crate::V3;
@@ -23,19 +24,19 @@ pub struct XYrect {
 }
 
 impl Hittable for XYrect {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
-        let t = (self.k - r.origin.z) / r.end.z;
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
+        let t = (self.k - ray.origin.z) / ray.end.z;
 
         if t.is_nan() {
             return None;
         }
 
-        if t < t_min || t > t_max {
+        if t < ray.setting.ray_time.min || t > ray.setting.ray_time.max {
             return None;
         }
 
-        let x = r.origin.x + t * r.end.x;
-        let y = r.origin.y + t * r.end.y;
+        let x = ray.origin.x + t * ray.end.x;
+        let y = ray.origin.y + t * ray.end.y;
 
         if x < self.x0 || x > self.x1 || y < self.y0 || y > self.y1 {
             return None;
@@ -44,10 +45,10 @@ impl Hittable for XYrect {
         let outward_normal = V3::new(0.0, 0.0, 1.0);
 
         Some(Hit::new(
-            r,
+            ray,
             outward_normal,
             t,
-            r.point_at_param(t),
+            ray.point_at_param(t),
             self.material,
             (x - self.x0) / (self.x1 - self.x0),
             (y - self.y0) / (self.y1 - self.y0),
@@ -94,19 +95,19 @@ pub struct XZrect {
 }
 
 impl Hittable for XZrect {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
-        let t = (self.k - r.origin.y) / r.end.y;
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
+        let t = (self.k - ray.origin.y) / ray.end.y;
 
         if t.is_nan() {
             return None;
         }
 
-        if t < t_min || t > t_max {
+        if t < ray.setting.ray_time.min || t > ray.setting.ray_time.max {
             return None;
         }
 
-        let x = r.origin.x + t * r.end.x;
-        let z = r.origin.z + t * r.end.z;
+        let x = ray.origin.x + t * ray.end.x;
+        let z = ray.origin.z + t * ray.end.z;
 
         if x < self.x0 || x > self.x1 || z < self.z0 || z > self.z1 {
             return None;
@@ -115,10 +116,10 @@ impl Hittable for XZrect {
         let outward_normal = V3::new(0.0, 1.0, 0.0);
 
         Some(Hit::new(
-            r,
+            ray,
             outward_normal,
             t,
-            r.point_at_param(t),
+            ray.point_at_param(t),
             self.material,
             (x - self.x0) / (self.x1 - self.x0),
             (z - self.z0) / (self.z1 - self.z0),
@@ -165,19 +166,19 @@ pub struct YZrect {
 }
 
 impl Hittable for YZrect {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
-        let t = (self.k - r.origin.x) / r.end.x;
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
+        let t = (self.k - ray.origin.x) / ray.end.x;
 
         if t.is_nan() {
             return None;
         }
 
-        if t < t_min || t > t_max {
+        if t < ray.setting.ray_time.min || t > ray.setting.ray_time.max {
             return None;
         }
 
-        let y = r.origin.y + t * r.end.y;
-        let z = r.origin.z + t * r.end.z;
+        let y = ray.origin.y + t * ray.end.y;
+        let z = ray.origin.z + t * ray.end.z;
 
         if y < self.y0 || y > self.y1 || z < self.z0 || z > self.z1 {
             return None;
@@ -186,10 +187,10 @@ impl Hittable for YZrect {
         let outward_normal = V3::new(1.0, 0.0, 0.0);
 
         Some(Hit::new(
-            r,
+            ray,
             outward_normal,
             t,
-            r.point_at_param(t),
+            ray.point_at_param(t),
             self.material,
             (y - self.y0) / (self.y1 - self.y0),
             (z - self.z0) / (self.z1 - self.z0),
@@ -227,10 +228,14 @@ impl Pdf for XZrect {
             setting: &RaySetting {
                 depth: 32,
                 background_color: V3::default(),
+                ray_time: Interval {
+                    min: 0.001,
+                    max: 2048.0,
+                },
             },
         };
 
-        match self.hit(&ray, 0.001, 2048.0) {
+        match self.hit(&ray) {
             Some(hit) => {
                 let area = (self.x1 - self.x0) * (self.z1 - self.z0);
                 let distance_squared = hit.t * hit.t * direction.length().powi(2);
@@ -262,10 +267,14 @@ impl Pdf for XYrect {
             setting: &RaySetting {
                 depth: 32,
                 background_color: V3::default(),
+                ray_time: Interval {
+                    min: 0.001,
+                    max: 2048.0,
+                },
             },
         };
 
-        match self.hit(&ray, 0.001, 2048.0) {
+        match self.hit(&ray) {
             Some(hit) => {
                 let area = (self.x1 - self.x0) * (self.y1 - self.y0);
                 let distance_squared = hit.t * hit.t * direction.length().powi(2);
@@ -297,10 +306,14 @@ impl Pdf for YZrect {
             setting: &RaySetting {
                 depth: 32,
                 background_color: V3::default(),
+                ray_time: Interval {
+                    min: 0.001,
+                    max: 2048.0,
+                },
             },
         };
 
-        match self.hit(&ray, 0.001, 2048.0) {
+        match self.hit(&ray) {
             Some(hit) => {
                 let area = (self.y1 - self.y0) * (self.z1 - self.z0);
                 let distance_squared = hit.t * hit.t * direction.length().powi(2);

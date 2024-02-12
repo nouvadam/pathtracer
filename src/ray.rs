@@ -1,5 +1,5 @@
 use crate::hit::*;
-use crate::misc::{MixturePdf, Pdf};
+use crate::misc::{Interval, MixturePdf, Pdf};
 use crate::Scene;
 use crate::V3;
 
@@ -23,6 +23,8 @@ pub struct RaySetting {
     pub background_color: V3<f32>,
     /// How many times rays should bounce between objects before returning color.
     pub depth: u16,
+    /// Time interval in which hit should occur for this ray.
+    pub ray_time: Interval,
 }
 
 impl Ray<'_> {
@@ -43,7 +45,7 @@ impl Ray<'_> {
     /// Recursively bounce ray between objects in scene, at each hit multiply current color of the ray with color of the object, or hit point on the object.
     fn color(&self, scene: &Scene, depth: u16) -> V3<f32> {
         // Does the intersection occur at all?
-        match scene.world.hit(self, 0.001, 2048.0) {
+        match scene.world.hit(self) {
             // If ray hit some object, then we bounce that Ray from the object with updated color.
             Some(hit) => {
                 let material = scene.materials.get(hit.material);

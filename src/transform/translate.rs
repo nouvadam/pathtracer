@@ -11,13 +11,13 @@ pub struct Translated {
 }
 
 impl Hittable for Translated {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
         let offset_ray = Ray {
-            origin: r.origin - self.offset,
-            ..*r
+            origin: ray.origin - self.offset,
+            ..*ray
         };
 
-        let hit = self.hittable.hit(&offset_ray, t_min, t_max);
+        let hit = self.hittable.hit(&offset_ray);
 
         hit.map(|hit| {
             Hit::new(

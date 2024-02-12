@@ -94,6 +94,10 @@ fn main() {
         ray_setting: RaySetting {
             background_color: V3::new(0.5, 0.7, 1.0),
             depth: 32,
+            ray_time: Interval {
+                min: 0.001,
+                max: 2048.0,
+            },
         },
         name: "random_scene",
     };

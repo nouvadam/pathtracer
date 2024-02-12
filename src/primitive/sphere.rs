@@ -1,5 +1,6 @@
 use crate::hit::*;
 use crate::hittables::Aabb;
+use crate::misc::Interval;
 use crate::misc::Onb;
 use crate::misc::Pdf;
 use crate::ray::*;
@@ -16,10 +17,10 @@ pub struct Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
-        let oc = r.origin - self.center;
-        let a = r.end.dot(r.end);
-        let b = oc.dot(r.end);
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
+        let oc = ray.origin - self.center;
+        let a = ray.end.dot(ray.end);
+        let b = oc.dot(ray.end);
         let c = oc.dot(oc) - self.radius * self.radius;
         let discriminant = b * b - a * c;
 
@@ -28,15 +29,15 @@ impl Hittable for Sphere {
             let t1 = (-b - (b * b - a * c).sqrt()) / a;
             let t2 = (-b + (b * b - a * c).sqrt()) / a;
 
-            if t1 < t_max && t1 > t_min {
+            if ray.setting.ray_time.contains(t1) {
                 t = t1;
-            } else if t2 < t_max && t2 > t_min {
+            } else if ray.setting.ray_time.contains(t2) {
                 t = t2;
             } else {
                 return None;
             }
 
-            let point = r.point_at_param(t);
+            let point = ray.point_at_param(t);
             let normal = (point - self.center) / self.radius;
             let pi = std::f32::consts::PI;
 
@@ -47,7 +48,7 @@ impl Hittable for Sphere {
             let u = 1.0 - (phi + pi) / (2.0 * pi);
             let v = (theta + pi / 2.0) / pi;
 
-            Some(Hit::new(r, normal, t, point, self.material, u, v))
+            Some(Hit::new(ray, normal, t, point, self.material, u, v))
         } else {
             None
         }
@@ -83,10 +84,14 @@ impl Pdf for Sphere {
             setting: &RaySetting {
                 depth: 32,
                 background_color: V3::default(),
+                ray_time: Interval {
+                    min: 0.001,
+                    max: 2048.0,
+                },
             },
         };
 
-        match self.hit(&ray, 0.001, 2048.0) {
+        match self.hit(&ray) {
             Some(_hit) => {
                 let cos_theta_max =
                     (1.0 - (self.radius.powi(2) / (self.center - origin).length().powi(2))).sqrt();

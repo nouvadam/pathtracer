@@ -23,10 +23,10 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
         self.list
             .iter()
-            .filter_map(|obj| obj.hit(r, t_min, t_max)) //get objects that were passed though by the ray
+            .filter_map(|obj| obj.hit(ray)) //get objects that were passed though by the ray
             .min_by(|x, y| x.t.partial_cmp(&y.t).expect("Tried to compare a NaN"))
         //choose the closest object to the cam, the one that is visible
     }

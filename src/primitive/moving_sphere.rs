@@ -40,7 +40,7 @@ impl MovingSphere {
 }
 
 impl Hittable for MovingSphere {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
         let oc = ray.origin - self.center(ray.time);
         let a = ray.end.dot(ray.end);
         let b = oc.dot(ray.end);
@@ -52,9 +52,9 @@ impl Hittable for MovingSphere {
             let t1 = (-b - (b * b - a * c).sqrt()) / a;
             let t2 = (-b + (b * b - a * c).sqrt()) / a;
 
-            if t1 < t_max && t1 > t_min {
+            if ray.setting.ray_time.surrounds(t1) {
                 time = t1;
-            } else if t2 < t_max && t2 > t_min {
+            } else if ray.setting.ray_time.surrounds(t2) {
                 time = t2;
             } else {
                 return None;

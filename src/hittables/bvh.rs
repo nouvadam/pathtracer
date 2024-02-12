@@ -13,11 +13,11 @@ pub struct BvhNode {
 }
 
 impl Hittable for BvhNode {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
-        if self.boxx.hit(r) {
-            let hit_right = self.right.hit(r, t_min, t_max);
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
+        if self.boxx.hit(ray) {
+            let hit_right = self.right.hit(ray);
 
-            match self.left.hit(r, t_min, t_max) {
+            match self.left.hit(ray) {
                 Some(hit_left) => match hit_right {
                     Some(hit_right) => {
                         if hit_left.t < hit_right.t {

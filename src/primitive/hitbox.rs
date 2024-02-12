@@ -86,8 +86,8 @@ impl HitBox {
 }
 
 impl Hittable for HitBox {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
-        self.sides.hit(r, t_min, t_max)
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
+        self.sides.hit(ray)
     }
 
     fn bounding_box(&self) -> Aabb {

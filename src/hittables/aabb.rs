@@ -11,6 +11,8 @@ pub struct Aabb {
     pub max: V3<f32>,
 }
 
+// static DELTA: f32 = 0.0001f32;
+
 impl Aabb {
     /// Checks if Ray intersects with this bounding box.
     pub fn hit(&self, ray: &Ray) -> bool {
@@ -46,7 +48,7 @@ impl Aabb {
     }
 
     /// Creates new bounding box that surrounds two bounding boxes.
-    pub fn surrounding_box(&self, second: Aabb) -> Aabb {
+    pub fn surrounding_box(&self, second: Aabb) -> Self {
         Aabb {
             min: V3::new(
                 self.min.x.min(second.min.x),
@@ -73,4 +75,11 @@ impl Aabb {
             })
             .collect()
     }
+
+    // /// Add padding to this bounding box to overcome numerical problems
+    // pub fn pad(&self) -> Self {
+    //     Aabb {
+
+    //     }
+    // }
 }

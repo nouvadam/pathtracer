@@ -1,9 +1,12 @@
+use std::io::{Error, ErrorKind};
+
 use crate::hit::*;
 use crate::hittables::{Aabb, BvhNode, HittableList};
 use crate::misc::Pdf;
 use crate::primitive::triangle::*;
 use crate::ray::*;
 use crate::V3;
+
 /// Mesh of triangles, or polygon model
 #[derive(Clone)]
 pub struct Mesh {
@@ -12,8 +15,8 @@ pub struct Mesh {
 }
 
 impl Hittable for Mesh {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
-        self.triangles.hit(r, t_min, t_max)
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
+        self.triangles.hit(ray)
     }
 
     fn bounding_box(&self) -> Aabb {
@@ -42,8 +45,12 @@ impl Mesh {
         let file_to_parse = fs::read_to_string(file_path)?;
 
         let mut triangles_list = HittableList::new();
-        let obj_file =
-            wavefront_obj::obj::parse(file_to_parse).expect("MESH CREATION FAILED. WE ARE DOOMED");
+        let obj_file = wavefront_obj::obj::parse(file_to_parse).map_err(|_err| {
+            Error::new(
+                ErrorKind::InvalidInput,
+                "MESH CREATION FALIED. WE ARE DOOMED",
+            )
+        })?;
 
         for object in obj_file.objects {
             for primitive in object.geometry {

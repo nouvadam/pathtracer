@@ -9,8 +9,8 @@ pub struct FlipFace {
 }
 
 impl Hittable for FlipFace {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
-        let hit = self.hittable.hit(r, t_min, t_max);
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
+        let hit = self.hittable.hit(ray);
 
         hit.map(|hit| hit.flip_front_face())
     }

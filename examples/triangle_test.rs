@@ -13,6 +13,7 @@ use pathtracer::transform::translate::*;*/
 //use pathtracer::Camera;
 use pathtracer::hittables::*;
 use pathtracer::material::*;
+use pathtracer::misc::Interval;
 use pathtracer::primitive::*;
 use pathtracer::texture::*;
 use pathtracer::transform::*;
@@ -60,6 +61,10 @@ fn main() {
         ray_setting: RaySetting {
             background_color: V3::new(0.5, 0.7, 1.0),
             depth: 32,
+            ray_time: Interval {
+                min: 0.001,
+                max: 2048.0,
+            },
         },
         name: "triangle_test",
     };

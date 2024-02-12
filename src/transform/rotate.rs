@@ -18,13 +18,17 @@ pub struct Rotated {
 }
 
 impl Hittable for Rotated {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
-        let origin = r.origin.rot(-self.axis, self.sin_theta, self.cos_theta);
-        let end = r.end.rot(-self.axis, self.sin_theta, self.cos_theta);
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
+        let origin = ray.origin.rot(-self.axis, self.sin_theta, self.cos_theta);
+        let end = ray.end.rot(-self.axis, self.sin_theta, self.cos_theta);
 
-        let rotated_ray = Ray { origin, end, ..*r };
+        let rotated_ray = Ray {
+            origin,
+            end,
+            ..*ray
+        };
 
-        let hit = self.hittable.hit(&rotated_ray, t_min, t_max);
+        let hit = self.hittable.hit(&rotated_ray);
 
         hit.map(|hit| {
             Hit::new(
