@@ -34,8 +34,9 @@ impl Hittable for Translated {
 
     fn bounding_box(&self) -> Aabb {
         Aabb {
-            min: self.hittable.bounding_box().min + self.offset,
-            max: self.hittable.bounding_box().max + self.offset,
+            x: self.hittable.bounding_box().x + self.offset.x,
+            y: self.hittable.bounding_box().y + self.offset.y,
+            z: self.hittable.bounding_box().z + self.offset.z,
         }
     }
 }

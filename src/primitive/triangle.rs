@@ -1,5 +1,6 @@
 use crate::hit::*;
 use crate::hittables::Aabb;
+use crate::misc::Interval;
 use crate::misc::Pdf;
 use crate::ray::*;
 use crate::V3;
@@ -95,24 +96,28 @@ impl Triangle {
             .map(|element| element.into_iter()) // casting V3 tuple to 3-element vector
             .multizip(); // creating 3 vectors which elements are from the same coordinate
 
-        let min: V3<f32> = rotated_and_zipped_points
-            .clone()
-            .map(|axis| {
-                axis.into_iter()
-                    .min_by(|x, y| x.partial_cmp(y).expect("Tried to compare a NaN"))
-                    .unwrap()
-            }) // for each vector containing elements from the same coordinate find the smallest element
-            .collect::<V3<f32>>();
+        let min = rotated_and_zipped_points.clone().map(|axis| {
+            axis.into_iter()
+                .min_by(|x, y| x.partial_cmp(y).expect("Tried to compare a NaN"))
+                .unwrap()
+        }); // for each vector containing elements from the same coordinate find the smallest element
 
-        let max: V3<f32> = rotated_and_zipped_points
-            .map(|axis| {
-                axis.into_iter()
-                    .max_by(|x, y| x.partial_cmp(y).expect("Tried to compare a NaN"))
-                    .unwrap()
-            })
-            .collect::<V3<f32>>();
+        let max = rotated_and_zipped_points.map(|axis| {
+            axis.into_iter()
+                .max_by(|x, y| x.partial_cmp(y).expect("Tried to compare a NaN"))
+                .unwrap()
+        });
 
-        Aabb { min, max }
+        let intervals: Vec<Interval> = min
+            .zip(max)
+            .map(|pair| Interval::new(pair.0, pair.1))
+            .collect();
+
+        Aabb {
+            x: intervals[0],
+            y: intervals[1],
+            z: intervals[2],
+        }
     }
 }
 

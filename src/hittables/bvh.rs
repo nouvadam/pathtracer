@@ -51,27 +51,27 @@ impl BvhNode {
             0 => {
                 sorted.sort_by(|a, b| {
                     a.bounding_box()
-                        .min
                         .x
-                        .partial_cmp(&b.bounding_box().min.x)
+                        .min
+                        .partial_cmp(&b.bounding_box().x.min)
                         .unwrap()
                 });
             }
             1 => {
                 sorted.sort_by(|a, b| {
                     a.bounding_box()
-                        .min
                         .y
-                        .partial_cmp(&b.bounding_box().min.y)
+                        .min
+                        .partial_cmp(&b.bounding_box().y.min)
                         .unwrap()
                 });
             }
             2 => {
                 sorted.sort_by(|a, b| {
                     a.bounding_box()
-                        .min
                         .z
-                        .partial_cmp(&b.bounding_box().min.z)
+                        .min
+                        .partial_cmp(&b.bounding_box().z.min)
                         .unwrap()
                 });
             }

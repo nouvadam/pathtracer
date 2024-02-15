@@ -1,6 +1,7 @@
 use crate::hit::*;
 use crate::hittables::Aabb;
 use crate::hittables::HittableList;
+use crate::misc::Interval;
 use crate::misc::Pdf;
 use crate::primitive::rectangle::*;
 use crate::ray::*;
@@ -92,8 +93,9 @@ impl Hittable for HitBox {
 
     fn bounding_box(&self) -> Aabb {
         Aabb {
-            min: self.box_min,
-            max: self.box_max,
+            x: Interval::new(self.box_min.x, self.box_max.x),
+            y: Interval::new(self.box_min.y, self.box_max.y),
+            z: Interval::new(self.box_min.z, self.box_max.z),
         }
     }
 }

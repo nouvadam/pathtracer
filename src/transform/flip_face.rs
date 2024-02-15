@@ -16,10 +16,7 @@ impl Hittable for FlipFace {
     }
 
     fn bounding_box(&self) -> Aabb {
-        Aabb {
-            min: self.hittable.bounding_box().min,
-            max: self.hittable.bounding_box().max,
-        }
+        self.hittable.bounding_box()
     }
 }
 

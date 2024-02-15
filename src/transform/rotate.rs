@@ -1,5 +1,5 @@
 use crate::hittables::Aabb;
-use crate::misc::{HittablePdf, Pdf};
+use crate::misc::{HittablePdf, Interval, Pdf};
 use crate::{Hit, Hittable, Ray, V3};
 
 /// Represents a hittable object that was rotated by some angle around some axis.
@@ -79,33 +79,39 @@ where
             .multizip(); // creating 3 vectors which elements are from the same coordinate - first vector contain all x component of verticles etc
 
         // Find minimum values in each axis vector
-        let min: V3<f32> = rotated_and_zipped_points
-            .clone()
-            .map(|axis| {
-                axis.into_iter()
-                    .min_by(|component0, component1| {
-                        component0
-                            .partial_cmp(component1)
-                            .expect("Tried to compare a NaN")
-                    })
-                    .unwrap()
-            }) // for each vector containing elements from the same coordinate find the smallest element
-            .collect::<V3<f32>>();
+        let min = rotated_and_zipped_points.clone().map(|axis| {
+            axis.into_iter()
+                .min_by(|component0, component1| {
+                    component0
+                        .partial_cmp(component1)
+                        .expect("Tried to compare a NaN")
+                })
+                .unwrap()
+        }); // for each vector containing elements from the same coordinate find the smallest element
 
-        let max: V3<f32> = rotated_and_zipped_points
-            .map(|axis| {
-                axis.into_iter()
-                    .max_by(|x, y| x.partial_cmp(y).expect("Tried to compare a NaN"))
-                    .unwrap()
-            })
-            .collect::<V3<f32>>();
+        let max = rotated_and_zipped_points.map(|axis| {
+            axis.into_iter()
+                .max_by(|x, y| x.partial_cmp(y).expect("Tried to compare a NaN"))
+                .unwrap()
+        });
+
+        let intervals: Vec<Interval> = min
+            .zip(max)
+            .map(|pair| Interval::new(pair.0, pair.1))
+            .collect();
+
+        let bounding_box = Aabb {
+            x: intervals[0],
+            y: intervals[1],
+            z: intervals[2],
+        };
 
         Rotated {
             sin_theta,
             cos_theta,
             axis,
-            bounding_box: Aabb { min, max },
             hittable: Box::new(self),
+            bounding_box,
         }
     }
 }

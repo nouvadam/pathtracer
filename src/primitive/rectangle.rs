@@ -57,8 +57,9 @@ impl Hittable for XYrect {
 
     fn bounding_box(&self) -> Aabb {
         Aabb {
-            min: V3::new(self.x0, self.y0, self.k - EPSILON),
-            max: V3::new(self.x1, self.y1, self.k + EPSILON),
+            x: Interval::new(self.x0, self.x1),
+            y: Interval::new(self.y0, self.y1),
+            z: Interval::new(self.k - EPSILON, self.k + EPSILON),
         }
     }
 }
@@ -128,8 +129,9 @@ impl Hittable for XZrect {
 
     fn bounding_box(&self) -> Aabb {
         Aabb {
-            min: V3::new(self.x0, self.k - EPSILON, self.z0),
-            max: V3::new(self.x1, self.k + EPSILON, self.z1),
+            x: Interval::new(self.x0, self.x1),
+            y: Interval::new(self.k - EPSILON, self.k + EPSILON),
+            z: Interval::new(self.z0, self.z1),
         }
     }
 }
@@ -199,8 +201,9 @@ impl Hittable for YZrect {
 
     fn bounding_box(&self) -> Aabb {
         Aabb {
-            min: V3::new(self.k - EPSILON, self.y0, self.z0),
-            max: V3::new(self.k + EPSILON, self.y1, self.z1),
+            x: Interval::new(self.k - EPSILON, self.k + EPSILON),
+            y: Interval::new(self.y0, self.y1),
+            z: Interval::new(self.z0, self.z1),
         }
     }
 }

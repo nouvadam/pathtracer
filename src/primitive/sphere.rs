@@ -56,10 +56,22 @@ impl Hittable for Sphere {
 
     fn bounding_box(&self) -> Aabb {
         let vektor = V3::new(self.radius, self.radius, self.radius);
+        let min = self.center - vektor;
+        let max = self.center + vektor;
 
         Aabb {
-            min: self.center - vektor,
-            max: self.center + vektor,
+            x: Interval {
+                min: min.x,
+                max: max.x,
+            },
+            y: Interval {
+                min: min.y,
+                max: max.y,
+            },
+            z: Interval {
+                min: min.z,
+                max: max.z,
+            },
         }
     }
 }

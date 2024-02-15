@@ -1,5 +1,6 @@
 use crate::hit::*;
 use crate::hittables::Aabb;
+use crate::misc::Interval;
 use crate::misc::Pdf;
 use crate::ray::*;
 use crate::V3;
@@ -77,14 +78,18 @@ impl Hittable for MovingSphere {
     }
 
     fn bounding_box(&self) -> Aabb {
+        let center0 = self.center(self.time_range.0);
         let t0_aabb = Aabb {
-            min: self.center(self.time_range.0) - V3::new(self.radius, self.radius, self.radius),
-            max: self.center(self.time_range.0) + V3::new(self.radius, self.radius, self.radius),
+            x: Interval::new(center0.x - self.radius, center0.x + self.radius),
+            y: Interval::new(center0.y - self.radius, center0.y + self.radius),
+            z: Interval::new(center0.z - self.radius, center0.z + self.radius),
         };
 
+        let center1 = self.center(self.time_range.1);
         let t1_aabb = Aabb {
-            min: self.center(self.time_range.1) - V3::new(self.radius, self.radius, self.radius),
-            max: self.center(self.time_range.1) + V3::new(self.radius, self.radius, self.radius),
+            x: Interval::new(center1.x - self.radius, center1.x + self.radius),
+            y: Interval::new(center1.y - self.radius, center1.y + self.radius),
+            z: Interval::new(center1.z - self.radius, center1.z + self.radius),
         };
 
         t0_aabb.surrounding_box(t1_aabb)
