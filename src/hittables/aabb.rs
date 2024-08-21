@@ -120,4 +120,28 @@ impl Aabb {
             },
         }
     }
+
+    pub fn longest_axis(&self) -> i32 {
+        if self.x.size() > self.y.size() {
+            match self.x.size() > self.z.size() {
+                true => 0,
+                false => 2,
+            }
+        } else {
+            match self.y.size() > self.z.size() {
+                true => 1,
+                false => 2,
+            }
+        }
+    }
+}
+
+impl Default for Aabb {
+    fn default() -> Self {
+        Self {
+            x: Interval::default(),
+            y: Interval::default(),
+            z: Interval::default(),
+        }
+    }
 }

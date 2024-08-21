@@ -2,7 +2,6 @@ use crate::hit::*;
 use crate::hittables::{Aabb, HittableList};
 use crate::misc::{HittablePdf, Pdf};
 use crate::ray::*;
-use rand::Rng;
 
 #[derive(Clone)]
 /// Octtree that contains Scene, for checking ray intersections in O(nlog(n)) time rather than in O(n^2)
@@ -41,13 +40,15 @@ impl Hittable for BvhNode {
 }
 
 impl BvhNode {
-    /// Tree is created by recursively dividing the scene, in form of hittableList, in half by plane aligned to each time randomly choosen axis
+    /// Tree is created by recursively dividing the scene, in form of hittableList, in half by plane aligned each time to the longest axis.
     pub fn new(hlist: &HittableList) -> BvhNode {
-        let rng = rand::thread_rng().gen_range(0..2);
-
+        // creating bounding box spanning whole set
         let mut sorted = hlist.list.clone();
+        let list_bounding_box = sorted.iter().fold(Aabb::default(), |acc, b| {
+            acc.surrounding_box(b.bounding_box())
+        });
 
-        match rng % 2 {
+        match list_bounding_box.longest_axis() {
             0 => {
                 sorted.sort_by(|a, b| {
                     a.bounding_box()

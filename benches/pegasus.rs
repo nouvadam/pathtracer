@@ -120,9 +120,9 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     );
 
     let image_config = ImageConfig {
-        nx: 1024,
-        ny: 1024,
-        samples_per_pixel: 16,
+        nx: 256,
+        ny: 256,
+        samples_per_pixel: 8,
         ray_setting: RaySetting {
             background_color: V3::new(0.0, 0.0, 0.0),
             depth: 16,
