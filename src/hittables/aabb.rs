@@ -18,6 +18,25 @@ pub struct Aabb {
 static DELTA: f32 = 0.0001f32;
 
 impl Aabb {
+    /// Takes the two points as extrema for the bounding box
+    pub fn new(a: V3<f32>, b: V3<f32>) -> Self {
+        Aabb {
+            x: Interval {
+                min: a.x.min(b.x),
+                max: a.x.max(b.x),
+            },
+            y: Interval {
+                min: a.y.min(b.y),
+                max: a.y.max(b.y),
+            },
+            z: Interval {
+                min: a.z.min(b.z),
+                max: a.z.max(b.z),
+            },
+        }
+        .pad()
+    }
+
     /// Checks if Ray intersects with this bounding box.
     pub fn hit(&self, ray: &Ray) -> bool {
         let inv_end = V3::new(1.0, 1.0, 1.0).div(ray.end);
