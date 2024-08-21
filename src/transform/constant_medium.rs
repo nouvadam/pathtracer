@@ -54,7 +54,7 @@ impl Hittable for ConstantMedium {
 
                         let ray_length = ray.end.length();
                         let distance_inside_boundary = (second_hit.t - first_hit.t) * ray_length;
-                        let random: f32 = rand::thread_rng().gen_range(0.0, 1.0);
+                        let random: f32 = rand::thread_rng().gen_range(0.0..1.0);
                         let hit_distance = self.neg_inv_density * random.ln();
 
                         if hit_distance > distance_inside_boundary {

@@ -27,7 +27,7 @@ impl MaterialTrait for Dielectric {
         let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
 
         let direction: V3<f32> = if (etai_over_etat * sin_theta > 1.0)
-            || (rand::thread_rng().gen_range(0.0, 1.0) < schlick(cos_theta, etai_over_etat))
+            || (rand::thread_rng().gen_range(0.0..1.0) < schlick(cos_theta, etai_over_etat))
         {
             reflect(unit_direction, hit.normal)
         } else {

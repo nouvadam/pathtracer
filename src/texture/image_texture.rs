@@ -17,9 +17,9 @@ impl ImageTexture {
         //reading texture
         use std::fs::File;
         let decoder = png::Decoder::new(File::open(file).unwrap());
-        let (info, mut reader) = decoder.read_info().unwrap();
+        let mut reader = decoder.read_info().unwrap();
         // Allocate the output buffer.
-        let mut texture = vec![0; info.buffer_size()];
+        let mut texture = vec![0; reader.output_buffer_size()];
         // Read the next frame. Currently this function should only called once.
         // The default options
         reader.next_frame(&mut texture).unwrap();
@@ -27,8 +27,8 @@ impl ImageTexture {
         ImageTexture {
             texture,
             bytes_per_pixel: 4,
-            width: info.width,
-            height: info.height,
+            width: reader.info().width,
+            height: reader.info().height,
         }
     }
 

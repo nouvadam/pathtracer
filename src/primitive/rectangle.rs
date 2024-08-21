@@ -253,9 +253,9 @@ impl Pdf for XZrect {
         //generate random point on XZ rectangle.
         use rand::Rng;
         let random_point = V3::new(
-            rand::thread_rng().gen_range(self.x0, self.x1),
+            rand::thread_rng().gen_range(self.x0..self.x1),
             self.k,
-            rand::thread_rng().gen_range(self.z0, self.z1),
+            rand::thread_rng().gen_range(self.z0..self.z1),
         );
         random_point - origin
     }
@@ -292,8 +292,8 @@ impl Pdf for XYrect {
         //generate random point on XZ rectangle.
         use rand::Rng;
         let random_point = V3::new(
-            rand::thread_rng().gen_range(self.x0, self.x1),
-            rand::thread_rng().gen_range(self.y0, self.y1),
+            rand::thread_rng().gen_range(self.x0..self.x1),
+            rand::thread_rng().gen_range(self.y0..self.y1),
             self.k,
         );
         random_point - origin
@@ -332,8 +332,8 @@ impl Pdf for YZrect {
         use rand::Rng;
         let random_point = V3::new(
             self.k,
-            rand::thread_rng().gen_range(self.y0, self.y1),
-            rand::thread_rng().gen_range(self.z0, self.z1),
+            rand::thread_rng().gen_range(self.y0..self.y1),
+            rand::thread_rng().gen_range(self.z0..self.z1),
         );
         random_point - origin
     }

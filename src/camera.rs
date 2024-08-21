@@ -85,7 +85,7 @@ impl Camera {
         Ray {
             origin: self.origin + offset,
             end,
-            time: rand::thread_rng().gen_range(self.time_begin, self.time_end),
+            time: rand::thread_rng().gen_range(self.time_begin..self.time_end),
             setting,
         }
     }

@@ -43,7 +43,7 @@ impl Hittable for BvhNode {
 impl BvhNode {
     /// Tree is created by recursively dividing the scene, in form of hittableList, in half by plane aligned to each time randomly choosen axis
     pub fn new(hlist: &HittableList) -> BvhNode {
-        let rng = rand::thread_rng().gen_range(0, 2);
+        let rng = rand::thread_rng().gen_range(0..2);
 
         let mut sorted = hlist.list.clone();
 
