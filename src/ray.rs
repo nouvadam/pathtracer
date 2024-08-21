@@ -82,14 +82,16 @@ impl Ray<'_> {
                             match scatter_record.specular_ray {
                                 Some(ray) => {
                                     // Returns specular ray.
-                                    scatter_record.attenuation.mul(ray.color(scene, depth + 1))
+                                    scatter_record
+                                        .attenuation
+                                        .hadamard(ray.color(scene, depth + 1))
                                 }
                                 None => {
                                     // Returns scattered ray.
                                     material.color_emitted(self, &hit)
                                         + ((scatter_record.attenuation
                                             * material.scattering_pdf(self, &hit, &scattered_ray))
-                                        .mul(scattered_ray.color(scene, depth + 1))
+                                        .hadamard(scattered_ray.color(scene, depth + 1))
                                             / pdf_val)
                                 }
                             }

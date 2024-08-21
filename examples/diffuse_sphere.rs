@@ -7,7 +7,7 @@ use pathtracer::*;
 
 fn main() {
     let mut hittable = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
 
     hittable.add(Sphere::new(
         V3::new(0.0, 0.0, -2.0),

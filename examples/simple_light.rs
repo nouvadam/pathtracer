@@ -5,7 +5,7 @@ use pathtracer::texture::*;
 use pathtracer::*;
 fn main() {
     let mut hittable = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
     let mut lights = HittableList::new();
 
     let perlin_texture = PerlinNoiseTexture {

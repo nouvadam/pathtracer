@@ -13,7 +13,7 @@ use rand::Rng;
 fn main() {
     let mut hittable = HittableList::new();
     let mut lights = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
 
     let scale = 2.0;
     let mut seed = rand::thread_rng();

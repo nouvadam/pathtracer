@@ -8,7 +8,7 @@ use rand::Rng;
 
 pub fn main() {
     let mut hittable = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
     let mut seed = rand::thread_rng();
 
     let checker_texture = CheckerTexture {
@@ -42,7 +42,7 @@ pub fn main() {
             );
             if (center - V3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.75 {
-                    let center2 = center + V3::new(0.0, seed.gen_range(0.0, 0.5), 0.0);
+                    let center2 = center + V3::new(0.0, seed.gen_range(0.0..0.5), 0.0);
 
                     let material = materials.add(Lambertian::new(Box::new(ConstantTexture {
                         color: V3::new(

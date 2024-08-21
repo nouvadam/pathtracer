@@ -128,7 +128,7 @@ impl<
     > V3<T>
 {
     /// Multiply Vector by another Vector element-wise.
-    pub fn mul(self, other: V3<T>) -> V3<T> {
+    pub fn hadamard(self, other: V3<T>) -> V3<T> {
         V3::new(self.x * other.x, self.y * other.y, self.z * other.z)
     }
     /// Divide Vector by another Vector element-wise.

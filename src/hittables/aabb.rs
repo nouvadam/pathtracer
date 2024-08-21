@@ -6,12 +6,11 @@ use itertools::*;
 /// Bounding box, to use with Octtree
 #[derive(Clone)]
 pub struct Aabb {
-    /// Represents cube's vertex that is lower-back-left  (on the negative side of coordinate system).
-    // pub min: V3<f32>,
-    /// Represents cube's vertex that is upper-front-right  (on the positive side of coordinate system).
-    // pub max: V3<f32>,
+    /// Represents cube side size on x axis
     pub x: Interval,
+    /// Represents cube side size on y axis
     pub y: Interval,
+    /// Represents cube side size on z axis
     pub z: Interval,
 }
 

@@ -12,7 +12,7 @@ fn main() {
     let mut boxes = HittableList::new();
     let mut objects = HittableList::new();
     let mut lights = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
 
     let glass_material = materials.add(Dielectric::new(1.5));
 
@@ -28,7 +28,7 @@ fn main() {
         let z0 = -1000.0 + (point.1 as f32) * w;
         let y0 = 0.0;
         let x1 = x0 + w;
-        let y1 = rand::thread_rng().gen_range(1.0, 101.0);
+        let y1 = rand::thread_rng().gen_range(1.0..101.0);
         let z1 = z0 + w;
 
         boxes.add(HitBox::new(
@@ -123,9 +123,9 @@ fn main() {
     (0..1000).for_each(|_x| {
         boxes2.add(Sphere::new(
             V3::new(
-                rand::thread_rng().gen_range(0.0, 165.0),
-                rand::thread_rng().gen_range(0.0, 165.0),
-                rand::thread_rng().gen_range(0.0, 165.0),
+                rand::thread_rng().gen_range(0.0..165.0),
+                rand::thread_rng().gen_range(0.0..165.0),
+                rand::thread_rng().gen_range(0.0..165.0),
             ),
             10.0,
             white,

@@ -87,14 +87,6 @@ pub struct MaterialContainer {
 }
 
 impl MaterialContainer {
-    /// Returns new material container.
-    pub fn new() -> MaterialContainer {
-        MaterialContainer {
-            materials: Vec::new(),
-            none_material: Box::new(Metalic::new(V3::new(0.8, 0.8, 0.9), 1.0)),
-        }
-    }
-
     /// Adds new material to container, returns it's index
     pub fn add<T: MaterialTrait + 'static>(&mut self, mat: T) -> usize {
         self.materials.push(Box::new(mat));
@@ -106,6 +98,16 @@ impl MaterialContainer {
         match self.materials.get(index) {
             Some(mat) => mat.as_ref(),
             None => self.none_material.as_ref(),
+        }
+    }
+}
+
+impl Default for MaterialContainer {
+    /// Returns new default material container.
+    fn default() -> Self {
+        MaterialContainer {
+            materials: Vec::new(),
+            none_material: Box::new(Metalic::new(V3::new(0.8, 0.8, 0.9), 1.0)),
         }
     }
 }

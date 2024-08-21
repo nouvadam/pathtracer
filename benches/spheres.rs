@@ -10,7 +10,7 @@ use pathtracer::*;
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     let mut hittable = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
 
     //ground
     hittable.add(Sphere::new(

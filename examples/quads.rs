@@ -7,7 +7,7 @@ use pathtracer::*;
 
 pub fn main() {
     let mut hittable = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
 
     let left_red = materials.add(Lambertian::new(Box::new(ConstantTexture {
         color: V3::new(1.0, 0.2, 0.2),

@@ -114,13 +114,13 @@ impl Render for Scene {
                     image_config.name, image_config.samples_per_pixel
                 ))
                 .expect("YOU FAILED");
-            image
-                .median_filter(1)
-                .write_file(&format!(
-                    "{}_{}_median_1.ppm",
-                    image_config.name, image_config.samples_per_pixel
-                ))
-                .expect("YOU FAILED");
+            // image
+            //     .median_filter(1)
+            //     .write_file(&format!(
+            //         "{}_{}_median_1.ppm",
+            //         image_config.name, image_config.samples_per_pixel
+            //     ))
+            //     .expect("YOU FAILED");
 
             println!(
                 "{} milliseconds for {} rays.",

@@ -9,7 +9,7 @@ use rand::Rng;
 fn main() {
     let mut hittable = HittableList::new();
     let mut seed = rand::thread_rng();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
     let glass_material = materials.add(Dielectric::new(1.5));
 
     let checker_texture = CheckerTexture {

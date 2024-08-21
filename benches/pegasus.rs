@@ -15,7 +15,7 @@ use pathtracer::*;
 pub fn criterion_benchmark(c: &mut Criterion) {
     let mut hittable = HittableList::new();
     let mut lights = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
 
     let _triangle_material = materials.add(Lambertian::new(Box::new(ConstantTexture {
         color: V3::new(1.0, 0.3, 0.3),

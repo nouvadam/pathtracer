@@ -7,7 +7,7 @@ use pathtracer::*;
 use rand::Rng;
 fn main() {
     let mut hittable = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
     let mut lights = HittableList::new();
     let mut seed = rand::thread_rng();
 

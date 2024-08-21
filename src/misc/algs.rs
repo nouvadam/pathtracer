@@ -60,7 +60,7 @@ mod tests {
     #[test]
     fn random_partition_test() {
         let mut rng = rand::thread_rng();
-        let mut array: Vec<u16> = (0..10).map(|_| rng.gen_range(0, 10)).collect();
+        let mut array: Vec<u16> = (0..10).map(|_| rng.gen_range(0..10)).collect();
         //println!("{:?}", array);
         let len = array.len() - 1;
 
@@ -84,7 +84,7 @@ mod tests {
     #[test]
     fn quickselect_test() {
         let mut rng = rand::thread_rng();
-        let mut array: Vec<u16> = (0..9).map(|_| rng.gen_range(0, 9)).collect();
+        let mut array: Vec<u16> = (0..9).map(|_| rng.gen_range(0..9)).collect();
         println!("{:?}", array);
         let mut s = array.clone();
         s.sort();

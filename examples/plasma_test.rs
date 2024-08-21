@@ -11,7 +11,7 @@ use rand::Rng;
 fn main() {
     let mut hittable = HittableList::new();
     let mut lights = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
 
     hittable.add(Sphere::new(
         V3::new(0.0, -100.5, -2.0),

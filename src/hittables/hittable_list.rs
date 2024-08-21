@@ -44,11 +44,9 @@ impl Hittable for HittableList {
 
 impl Pdf for HittableList {
     fn value(&self, origin: crate::V3<f32>, direction: crate::V3<f32>) -> f32 {
-        use std::convert::TryFrom;
+        use std::convert::From;
 
-        let weight: f32 = 1.0f32
-            / f32::try_from(self.list.len() as u16)
-                .expect("HittableList PDF value generation critically failed.");
+        let weight: f32 = 1.0f32 / f32::from(self.list.len() as u16);
         let weighted_sum_of_probs = self.list.iter().fold(0.0, |acc, object| {
             acc + object.value(origin, direction) * weight
         });

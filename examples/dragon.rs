@@ -11,7 +11,7 @@ use pathtracer::*;
 
 fn main() {
     let mut hittable = HittableList::new();
-    let mut materials = MaterialContainer::new();
+    let mut materials = MaterialContainer::default();
 
     let triangle_material = materials.add(Lambertian::new(Box::new(ConstantTexture {
         color: V3::new(0.4, 0.4, 0.9),
